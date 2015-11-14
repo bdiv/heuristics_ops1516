@@ -26,3 +26,7 @@
 *.exe
 *.out
 *.app
+
+# Stupid stuff
+*.thumb
+*.txt
