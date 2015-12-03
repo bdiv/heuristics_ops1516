@@ -3,12 +3,12 @@
 individual::individual(unsigned int n)
 {
     this->n = n;
-    for(int i = 0; i < n; i++) this->v->push_back(i);
+    for(unsigned int i = 0; i < n; i++) this->v.push_back(i);
     std::random_shuffle(v.begin(),v.end());
     this->init();
 }
 
-individual::individual(unsigned int n, std::vector & <unsigned int> v)
+individual::individual(unsigned int n, std::vector<unsigned int> & v)
 {
     this->n = n;
     this->init();
@@ -20,15 +20,20 @@ individual::~individual()
     //dtor
 }
 
-unsigned int individual::getScore()
-{
-    return this->score;
-}
-
 void individual::init()
 {
     this->locked = false;
-    this->score();
+    individual::score(this->v);
+}
+
+unsigned int individual::getScore()
+{
+    return  this->sc;
+}
+
+bool individual::isLocked()
+{
+    return this->isLocked();
 }
 
 std::vector<unsigned int> & individual::getVector()
@@ -44,20 +49,22 @@ std::vector<unsigned int> & individual::getVector()
 *       - value(i) == value(j) + (j-i) -> diagonal overlap
 *       - value(i) == value(j) - (j-i) -> the other diagonal overlap
 */
-void individual::score()
+unsigned int individual::score(std::vector<unsigned int> & v)
 {
-    for(int i = 0; i < n-1; i++)
+    unsigned int sc = 0;
+    unsigned int n = v.size();
+    for(unsigned int i = 0; i < n-1; i++)
     {
-        for(int j = i+1; j < n; j++)
+        for(unsigned int j = i+1; j < n; j++)
         {
             unsigned int m = j-i;
-            if( this->v->at(i) == this->v->at(j) ||
-                this->v->at(i) == (this->v->at(j) + m) ||
-                this->v->at(i) == (this->v->at(j) - m))
+            if( v.at(i) == v.at(j) ||
+                v.at(i) == (v.at(j) + m) ||
+                v.at(i) == (v.at(j) - m))
             {
-                this->score++;
+                sc++;
             }
         }
     }
-
+    return sc;
 }
