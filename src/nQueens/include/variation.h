@@ -2,6 +2,8 @@
 #define VARIATION_H
 #include "population.h"
 
+namespace nQueens {
+
 class variation
 {
     public:
@@ -18,5 +20,5 @@ class variation
         static std::vector<unsigned int> generateChild(); // simply copies the vector of a parent so that we can work on it
         variation();
 };
-
+}
 #endif // VARIATION_H

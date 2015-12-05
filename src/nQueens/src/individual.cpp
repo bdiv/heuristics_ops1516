@@ -1,5 +1,6 @@
 #include "individual.h"
 
+namespace nQueens {
 individual::individual(unsigned int n)
 {
     this->n = n;
@@ -67,4 +68,5 @@ unsigned int individual::score(std::vector<unsigned int> & v)
         }
     }
     return sc;
+}
 }

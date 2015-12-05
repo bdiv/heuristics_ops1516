@@ -4,6 +4,8 @@
 #include <vector>
 #include <algorithm>
 
+namespace nQueens{
+
 class individual
 {
     public:
@@ -22,5 +24,5 @@ class individual
         unsigned int sc;          // score of the individual
         void init();                 // initialize class variables
 };
-
+}
 #endif // INDIVIDUAL_H

@@ -2,6 +2,8 @@
 #define POPULATION_H
 #include "individual.h"
 
+namespace nQueens {
+
 class population
 {
     public:
@@ -16,5 +18,5 @@ class population
         unsigned int n;                 // number of genes an individual has
         std::vector<individual*> individuals; // datastructure for the individuals
 };
-
+}
 #endif // POPULATION_H

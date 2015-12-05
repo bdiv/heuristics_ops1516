@@ -1,5 +1,7 @@
 #include "variation.h"
 #include <algorithm>
+
+namespace nQueens {
 variation::variation()
 {
     //ctor
@@ -46,8 +48,8 @@ void variation::matched_crossover(population & pop)
         }
     }
 
-    // parent1 always has the lowest score
-    if(individual::score(child1) >= individual::score(child2))
+    // parent1 always has the worst score of the two parents
+    if(individual::score(child1) <= individual::score(child2))
     {
         parent1 = new individual(n,child1);
     }
@@ -86,6 +88,7 @@ void variation::ordered_crossover(population & pop)
             child2.erase(std::find(child2.begin(), child2.end(), (*(child1.begin()+i))));
         }
         child2.insert(child2.begin()+start, child1.begin()+start, child1.begin()+stop);
+        // parent1 always has the worst score
         parent1 = new individual(n, child2);
     }
 }
@@ -131,4 +134,5 @@ std::pair<std::vector<unsigned int>, std::vector<unsigned int> > variation::gene
     std::copy(parent2->getVector().begin(), parent2->getVector().end(), child2.begin());
 
     return std::pair<std::vector<unsigned int>,std::vector<unsigned int> >(child1, child2);
+}
 }
