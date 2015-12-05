@@ -1,5 +1,5 @@
 #include "population.h"
-#include "individual.h"
+
 
 namespace nQueens {
 

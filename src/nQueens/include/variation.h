@@ -1,6 +1,7 @@
 #ifndef VARIATION_H
 #define VARIATION_H
 #include "population.h"
+#include "crossbreedFunctor.h"
 
 namespace nQueens {
 
@@ -8,9 +9,20 @@ class variation
 {
     public:
         static void mutation(individual & i, double pMutation);
-        static void matched_crossover(population & pop); // Landscape analysis and efficient metaheuristics
-                                                         // for solving the n-queens problem
-        static void ordered_crossover(population & pop); // Landscape analysis and efficient metaheuristics
+
+        class matched_crossover : public crossbreedFunctor
+        {
+            public:
+                individual operator() (population & pop);
+        };
+       // static individual matched_crossover(population & pop); // Landscape analysis and efficient metaheuristics
+                                                                // for solving the n-queens problem
+        class ordered_crossover : public crossbreedFunctor
+        {
+            public:
+                individual operator() (population & pop);
+        };
+        //static individual ordered_crossover(population & pop); // Landscape analysis and efficient metaheuristics
                                                          // for solving the n-queens problem
         virtual ~variation();
     protected:

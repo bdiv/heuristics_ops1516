@@ -18,7 +18,7 @@ variation::~variation()
 *   elements in the range get swapped
 *
 */
-void variation::matched_crossover(population & pop)
+individual variation::matched_crossover::operator()(population & pop)
 {
     // initialization block...
     std::pair<individual*, individual*> parents = pop.chooseTwoRandom();
@@ -57,13 +57,14 @@ void variation::matched_crossover(population & pop)
     {
         parent1 = new individual(n,child2);
     }
+    return (*parent1);
 }
 
 /*  This crossover produces only one child by selecting an area in the first parent, erasing all elements of said area in parent two
 *   then insert that area from parent1 into parent2 moving back all elements that are in the way
 *   see: "Landscape analysis and efficient metaheuristics for solving the n-queens problem"
 */
-void variation::ordered_crossover(population & pop)
+individual variation::ordered_crossover::operator()(population & pop)
 {
     // initialization block
     std::pair<individual*, individual*> parents = pop.chooseTwoRandom();
@@ -91,6 +92,7 @@ void variation::ordered_crossover(population & pop)
         // parent1 always has the worst score
         parent1 = new individual(n, child2);
     }
+    return (*parent1);
 }
 
 void variation::mutation(individual & i, double pMutation)
