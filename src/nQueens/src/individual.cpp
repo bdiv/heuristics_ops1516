@@ -1,15 +1,40 @@
 #include"individual.h"
 #include<iostream>
+#include<stdlib.h>
+#include<time.h>
 
 namespace nQueens {
 
 //konstruktor nur mit Länge n
 //Bei der Init werden immer die gleichen hergestellt :-(  können wir das noch anders machen / oder ist das egal ?
+/*
 individual::individual(unsigned int n)
 {
     this->n = n;
     for(unsigned int i = 0; i < n; i++) this->v.push_back(i);
     std::random_shuffle(v.begin(),v.end());
+    this->init();
+}
+*/
+//eine Alternative das nicht immer die gleichen sind
+individual::individual(unsigned int n)
+{
+    int s = 0;
+    this->n = n;
+    for(int i=0;i<n;)
+    {
+        int c = rand() %n;
+        for(int w=0;w<v.size();w++)
+        {
+            if(c==v[w])s = 1;
+        }
+        if(s==0)
+        {
+            i++;
+            v.push_back(c);
+        }
+        else s = 0;
+    }
     this->init();
 }
 
@@ -67,9 +92,21 @@ std::vector<unsigned int> & individual::getVector()
 *   scores the individual based on the following conditions:
 *   - score = 0 is a solution
 *   - increase score if:
-*       - value(i) == value(j) -> horizontal overlap
+*       - value(i) == value(j) -> horizontal overlap /
+*       wir können gar keinen horizontalen overlap haben ? da müssten 2 einträge an einer Stelle im Vektor sein
+*       ich glaube du meinst vertikal.
 *       - value(i) == value(j) + (j-i) -> diagonal overlap
 *       - value(i) == value(j) - (j-i) -> the other diagonal overlap
+
+        Ich komm auch noch nicht ganz mit mit dem Score
+        z.B v = 4,2,1,0,3; wenn ich das aufzeichne komm ich auf 3 aber es ist 4;
+        z.B v = 4,0,3,2,1; wenn ich das aufzeichne komm ich auf 3 aber es ist 4;
+        z.B v = 1,2,3,4,0; wenn ich das aufzeichne komm ich auf 3 aber es ist 6;
+        z.B v = 1,3,2,0,4; hier stimmt es aber mit 2
+
+        ich dachte du zählst nur nach unten ?
+        Irgendwas ist noch nicht koscher aber ich seh nichts :-(
+
 */
 unsigned int individual::score(std::vector<unsigned int> & v)
 {
