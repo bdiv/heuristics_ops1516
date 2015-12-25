@@ -23,7 +23,7 @@ class individual
         std::vector<unsigned int> & getVector();                    // returns reference to the position vector
         void printIndu();                                           // gibt alle Werte eines Indi aus (später nur den Vektor);
     //protected:
-    //private:
+    //private: to do getter und setter !
         //Members
         std::vector<unsigned int> v;    // vector holding the horizontal positions of the queens
         unsigned int n;                 // constant number of rows
