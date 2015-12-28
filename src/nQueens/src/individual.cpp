@@ -1,4 +1,4 @@
-#include"individual.h"
+#include"../include/individual.h"
 #include<iostream>
 #include<stdlib.h>
 #include<time.h>

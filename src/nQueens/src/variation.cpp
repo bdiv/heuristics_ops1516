@@ -1,4 +1,4 @@
-#include "variation.h"
+#include "../include/variation.h"
 #include <algorithm>
 
 namespace nQueens {

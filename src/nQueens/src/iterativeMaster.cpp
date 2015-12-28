@@ -1,4 +1,4 @@
-#include "iterativeMaster.h"
+#include "../include/iterativeMaster.h"
 
 
 namespace nQueens {

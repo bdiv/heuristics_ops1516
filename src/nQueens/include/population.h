@@ -16,10 +16,10 @@ class population
 
         //methoden
         void init();        // initialize population with random individuals
-        //individual& getRandomIndividual();                      // return a random individual which is not in use (indicated by flag)
-        //dstd::pair<individual&,individual&> chooseTwoRandom();   // returns a pair of random parent individuals, first will have the lower score
-        //void scoreAll();    //Alle Individuen bekommen einen score;
-        void printAll();    //gibt alle indu aus (Test methode)
+        individual& getRandomIndividual();                      // return a random individual which is not in use (indicated by flag)
+        std::pair<individual&,individual&> chooseTwoRandom();   // returns a pair of random parent individuals, first will have the lower score
+        void scoreAll();    //Alle Individuen bekommen einen score;
+        void printAll();    //gibt alle individuen aus (Test methode)
 
     private:
 

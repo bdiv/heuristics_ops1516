@@ -1,6 +1,6 @@
 #ifndef CROSSBREEDFUNCTOR_H
 #define CROSSBREEDFUNCTOR_H
-#include <population.h>
+#include "population.h"
 
 namespace nQueens {
 class crossbreedFunctor
