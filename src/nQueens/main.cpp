@@ -24,6 +24,12 @@ int main()
     //2: Da wollten wir doch was machen das es keine horizontalen überschneidungen gibt ?
     //oder wahr das gleich die erste und einzige Möglichkeit
 
+    // horizontale überschneidungen gibt es nicht, wenn die population erstellt wird.
+    // Sie könnte theoretisch auftreten, wenn man einen blöden crossbreedFunctor designed.
+    // die jetzigen sollten aber darauf achten
+    // als letztes Notfallnetz haben wir immer die Score, die unterirdisch schlecht wird,
+    // wenn wir zusätzlich zu diagonalen auch horizontale Überschneidungen haben
+
     poli.printAll();
 
     return 0;
