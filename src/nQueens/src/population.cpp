@@ -6,17 +6,13 @@ namespace nQueens {
 
 
 //Konstruktor
-population::population(unsigned int n, unsigned int x, double pMutation)
+population::population(unsigned int n, unsigned int x, double pMutation) : n(n), pMutation(pMutation)
 {
-    this->n = n;
-    this->pMutation = pMutation;
-    //fehlermeldung :
-    //invalid user-defined conversion from 'nQueens::individual*' to 'const value_type& {aka const nQueens::individual&}'
-    //ob das jetzt von dir so vorgesehen war kann ich nicht sagen :-(
+    // create n dudes for our population
     for(unsigned int i = 0; i < x; i++)
     {
-        individual neues(n);
-        this->individuals.push_back(neues);
+        individual dude(n);
+        this->individuals.push_back(dude);
     }
 }
 
@@ -27,16 +23,22 @@ population::~population()
 }
 
 //Methoden
-/*
+
+// scores all individuals
+// we have to do that if we create a new population
 void population::scoreAll()
 {
+    // loop through all individuals
     for(int i=0;i<this->individuals.size();i++)
     {
         std::cout << "das da " << std::endl;
+        // score individual
+        // this will maybe become a static function in the future
+        // for optimizing our vtables and use of memory
         individuals[i].score(individuals[i].v);
     }
 }
-*/
+
 void population::printAll()
 {
     for(int i=0;i<this->individuals.size();i++)
@@ -45,44 +47,60 @@ void population::printAll()
     }
 }
 
-//fehlermeldung:
-//prototype for 'nQueens::individual* nQueens::population::getRandomIndividual()' does not match any in class 'nQueens::population'|
+// grab a random dude out of the bag and throw it in the callers face
 individual& population::getRandomIndividual()
 {
-    unsigned int key = rand() % this->individuals.size();
+    // choose a key at random
+    unsigned int key = rand() % this->individuals.size()-1;
+    // if the individual ist not locked, hence not engaged in intercourse
     if(!(this->individuals.at(key).isLocked() ))
     {
+        // throw the dude
         return this->individuals.at(key);
     }
+    // else, if we're not at the start or end
     else if(key > 0 && key < this->individuals.size()-1)
     {
+        // check left and right neighbor of our dude
         if(!this->individuals.at(key+1).isLocked())
         {
+            // not locked? nice! throw him!
             return this->individuals.at(key+1);
         }
         else if(!this->individuals.at(key-1).isLocked())
         {
+            // not locked? nice! throw him!
             return this->individuals.at(key-1);
         }
     }
+    // if all fails ... choose another dude
+    // we really wanna throw one
     return this->getRandomIndividual();
 }
 
-//Fehlermeldung:
-//prototype for 'std::pair<nQueens::individual*, nQueens::individual*> nQueens::population::chooseTwoRandom()' does not match any in class 'nQueens::population'|
-//Ich kenn das nur das man in beiden mit dem & arbeitet so hab ich es verwendet beim raytracer
-//aber wenn ich das mache dann ist die Fehleremeldung zwei zeilen darunter
-//sorry
+// choose two dudes at random and throw them in somebodies face
 std::pair<individual&,individual&> population::chooseTwoRandom()
 {
+    // we get one dude
     individual parent1 = this->getRandomIndividual();
+    // we get another
     individual parent2 = this->getRandomIndividual();
+    // they should not be the same dude
+    while(parent1==parent2)
+    {
+        // if they are, get another random dude
+        parent2 = this->getRandomIndividual();
+    }
+    // order them according to their score
+    // simplifies some things later
     if(parent1.getScore() < parent2.getScore())
     {
+        // triangle swap
         individual temp = parent1;
         parent1 = parent2;
         parent2 = temp;
     }
+    // tie up the dudes and throw them
     return std::pair<individual &, individual &>(parent1, parent2);
 }
 }

@@ -3,6 +3,12 @@
 
 namespace nQueens {
 
+/*
+    This class is a universal iterative solver for the nQueens problem.
+    It wraps around the population and uses defined functors (crossbreedFunctor) to change this
+    population in a way specified by genomic algorithms
+*/
+
 // simple constructor
 iterativeMaster::iterativeMaster(unsigned int n, unsigned int x, double pMutation): pop(population(n,x,pMutation))
 {
