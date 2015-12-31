@@ -24,8 +24,9 @@ class population
     private:
 
         //Members
-        double pMutation;                       // probability for mutation after cross
         unsigned int n;                         // number of genes an individual has
+        double pMutation;                       // probability for mutation after cross
+
         std::vector<individual> individuals;    // datastructure for the individuals
 };
 }
