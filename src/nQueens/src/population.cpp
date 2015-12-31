@@ -29,7 +29,7 @@ population::~population()
 void population::scoreAll()
 {
     // loop through all individuals
-    for(int i=0;i<this->individuals.size();i++)
+    for(unsigned int i=0;i<this->individuals.size();i++)
     {
         std::cout << "das da " << std::endl;
         // score individual
@@ -41,7 +41,7 @@ void population::scoreAll()
 
 void population::printAll()
 {
-    for(int i=0;i<this->individuals.size();i++)
+    for(unsigned int i=0;i<this->individuals.size();i++)
     {
         individuals[i].printIndu();
     }
@@ -86,7 +86,7 @@ std::pair<individual&,individual&> population::chooseTwoRandom()
     // we get another
     individual parent2 = this->getRandomIndividual();
     // they should not be the same dude
-    while(parent1==parent2)
+    while(parent1.getVector()==parent2.getVector())
     {
         // if they are, get another random dude
         parent2 = this->getRandomIndividual();
