@@ -1,5 +1,5 @@
 #include<iostream>
-#include"population.h"
+#include"include/population.h"
 #include<stdlib.h>
 #include<time.h>
 
