@@ -19,7 +19,7 @@ int main()
     time_t          now;        //Time now
     unsigned int    w=0;        //Which crossbread;
     std::vector<unsigned int> solution;
-    nQueens::crossbreedFunctor &breed = nQueens::variation::matched_crossover();
+    nQueens::crossbreedFunctor * breed;
 
     std::string input = "";
     //input n;
@@ -98,11 +98,11 @@ int main()
     nQueens::iterativeMaster master(n,x,p);
     if(w==1)
     {
-        breed = nQueens::variation::matched_crossover;
+        breed = new nQueens::variation::matched_crossover();
     }
     else
     {
-        breed = nQueens::variation::ordered_crossover;
+        breed = new nQueens::variation::ordered_crossover();
     }
 
     //Which solve used
@@ -120,7 +120,7 @@ int main()
             }
             std::cout << "Invalid" << std::endl;
             //Solve wich max
-            master.solve(n,breed);
+            master.solve(n,(*breed));
         }
         break;
         case 2:
@@ -139,13 +139,13 @@ int main()
             time_t now = time(NULL);
             now = now + t*60;
             //Solve with time
-            master.solve(now,breed);
+            master.solve(now,(*breed));
         }
         break;
         case 3:
         {
             //Solve until first solution
-            master.solve(breed);
+            master.solve((*breed));
         }
         break;
         default:
