@@ -18,7 +18,7 @@ variation::~variation()
 *   elements in the range get swapped
 *
 */
-individual variation::matched_crossover::operator()(population & pop)
+virtual individual variation::matched_crossover::operator()(population & pop)
 {
     // initialization block...
     // choose two parents at random
@@ -79,7 +79,7 @@ individual variation::matched_crossover::operator()(population & pop)
 *   then insert that area from parent1 into parent2 moving back all elements that are in the way
 *   see: "Landscape analysis and efficient metaheuristics for solving the n-queens problem"
 */
-individual variation::ordered_crossover::operator()(population & pop)
+virtual individual variation::ordered_crossover::operator()(population & pop)
 {
     // initialization block
     // choose two random parents

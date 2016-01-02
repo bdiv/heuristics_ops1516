@@ -27,14 +27,14 @@ class variation
         class matched_crossover : public crossbreedFunctor
         {
             public:
-                individual operator() (population & pop);
+                individual operator() (population & pop) override;
         };
         // Source: "Landscape analysis and efficient metaheuristics for solving the n-queens problem"
         // for the theory behind the implementation of:
         class ordered_crossover : public crossbreedFunctor
         {
             public:
-                individual operator() (population & pop);
+                individual operator() (population & pop) override;
         };
 
         virtual ~variation();
