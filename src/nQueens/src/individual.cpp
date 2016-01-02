@@ -7,34 +7,15 @@ namespace nQueens {
 
 //konstruktor nur mit Länge n
 //Bei der Init werden immer die gleichen hergestellt :-(  können wir das noch anders machen / oder ist das egal ?
-/*
-individual::individual(unsigned int n)
+
+individual::individual(unsigned int n): n(n)
 {
-    this->n = n;
+    // create vector with elements [0,1,2...n]
     for(unsigned int i = 0; i < n; i++) this->v.push_back(i);
-    std::random_shuffle(v.begin(),v.end());
-    this->init();
-}
-*/
-//eine Alternative das nicht immer die gleichen sind
-individual::individual(unsigned int n)
-{
-    int s = 0;
-    this->n = n;
-    for(int i=0;i<n;)
-    {
-        int c = rand() %n;
-        for(int w=0;w<v.size();w++)
-        {
-            if(c==v[w])s = 1;
-        }
-        if(s==0)
-        {
-            i++;
-            v.push_back(c);
-        }
-        else s = 0;
-    }
+    // init seed with our pointer in memory converted to int
+    srand(int(this));
+    // randomize the elements
+    for(unsigned int i = 0; i < n; i++) std::swap(v.at(i), v.at(rand()%n));
     this->init();
 }
 

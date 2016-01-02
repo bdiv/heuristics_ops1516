@@ -35,7 +35,7 @@ void population::scoreAll()
         // score individual
         // this will maybe become a static function in the future
         // for optimizing our vtables and use of memory
-        individuals[i].score(individuals[i].v);
+        individuals[i].score(individuals[i].getVector());
     }
 }
 

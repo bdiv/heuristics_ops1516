@@ -150,15 +150,15 @@ void variation::mutation(individual & i, double pMutation)
 std::pair<unsigned int, unsigned int> variation::chooseRandomArea(unsigned int n)
 {
     // just another way of assigning two random values that should not be equal afterwards
-    unsigned int start = rand() % n-1;
+    unsigned int start = rand() % n-2;
     unsigned int stop = start;
     // until they are not equal
     while(stop == start)
     {
         stop = rand() % n-1;
     }
-    // triangle swap if start<stop, bc we cant have that right?
-    if(start < stop)
+    // triangle swap if start>stop, bc we cant have that right?
+    if(start > stop)
     {
         unsigned int temp = start;
         start = stop;
