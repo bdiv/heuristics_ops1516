@@ -93,4 +93,25 @@ unsigned int iterativeMaster::solve(std::time_t timeout, crossbreedFunctor & bre
     return this->solutions.size();
 }
 
+unsigned int iterativeMaster::solve(crossbreedFunctor & breed)
+{
+    // save number of current solutions
+    unsigned int n = this->solutions.size();
+    // while nothing changes
+    while(n == this->solutions.size())
+    {
+        // breed a dude
+        // he'll automatically be in the population and replace the parent with
+        // the lowest score
+        individual dude = breed(this->pop);
+        // check the dude
+        // scores equal 0 are solutions, scores > 0 are suboptimal
+        if(dude.getScore() == 0)
+        {
+            // grab'n'sack the dude
+            this->solutions.push_back(dude);
+        }
+    }
+}
+
 }

@@ -22,6 +22,8 @@ class iterativeMaster
         unsigned int solve(unsigned int maxVariations, crossbreedFunctor & breed);
         // solver that runs until it reached a specified point in time (timeout)
         unsigned int solve(std::time_t timeout, crossbreedFunctor & breed);
+        // solver that runs until we found another solution besides the ones we already have
+        unsigned int solve(crossbreedFunctor & breed);
     protected:
     private:
         // containes the individuals
