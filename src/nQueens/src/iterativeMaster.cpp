@@ -57,9 +57,11 @@ unsigned int iterativeMaster::solve(unsigned int maxVariations, crossbreedFuncto
         if(dude.getScore() == 0)
         {
             // grab and sack the dude
-            std::vector<std::vector<unsigned int>> isoForms = iterativeMaster::generateIsoForms(dude);
-            this->solutions.insert(this->solutions.end(), isoForms.begin(), isoForms.end());
-
+            //std::vector<std::vector<unsigned int>> isoForms = iterativeMaster::generateIsoForms(dude);
+            //this->solutions.insert(this->solutions.end(), isoForms.begin(), isoForms.end());
+            std::vector<unsigned int> d;
+            d.assign(dude.getVector().begin(),dude.getVector().end());
+            this->solutions.push_back(d);
         }
     }
     // return number of solutions
@@ -88,8 +90,11 @@ unsigned int iterativeMaster::solve(std::time_t timeout, crossbreedFunctor & bre
         if(dude.getScore() == 0)
         {
             // grab'n'sack the dude
-            std::vector<std::vector<unsigned int>> isoForms = iterativeMaster::generateIsoForms(dude);
-            this->solutions.insert(this->solutions.end(), isoForms.begin(), isoForms.end());
+            //std::vector<std::vector<unsigned int>> isoForms = iterativeMaster::generateIsoForms(dude);
+            //this->solutions.insert(this->solutions.end(), isoForms.begin(), isoForms.end());
+            std::vector<unsigned int> d;
+            d.assign(dude.getVector().begin(),dude.getVector().end());
+            this->solutions.push_back(d);
         }
     }
     // return number of solutions found
@@ -112,40 +117,41 @@ unsigned int iterativeMaster::solve(crossbreedFunctor & breed)
         if(dude.getScore() == 0)
         {
             // grab'n'sack the dude and it's isoForms
-            std::vector<std::vector<unsigned int>> isoForms = iterativeMaster::generateIsoForms(dude);
-            this->solutions.insert(this->solutions.end(), isoForms.begin(), isoForms.end());
+            //std::vector<std::vector<unsigned int>> isoForms = iterativeMaster::generateIsoForms(dude);
+            //this->solutions.insert(this->solutions.end(), isoForms.begin(), isoForms.end());
+            std::vector<unsigned int> d;
+            d.assign(dude.getVector().begin(),dude.getVector().end());
+            this->solutions.push_back(d);
         }
     }
 }
 
-std::vector <std::vector<unsigned int>> iterativeMaster::generateIsoForms(individual & i)
+void iterativeMaster::generateIsoForms(std::vector<std::vector<unsigned int>> & v)
 {
-    // create data structure to work on
-    std::vector<unsigned int> dude;
-    // copy vector of the individual in working data structure
-    std::copy(i.getVector().begin(), i.getVector().end(),dude.begin());
-    // create vector of vectors to store iso forms
-    std::vector< std::vector < unsigned int > > isoForms;
-    // push our first entry
-    isoForms.push_back(dude);
-    iterativeMaster::invert(dude);
-    isoForms.push_back(dude);
-    // 90°
-    iterativeMaster::swapReorder(dude);
-    isoForms.push_back(dude);
-    iterativeMaster::invert(dude);
-    isoForms.push_back(dude);
-    // 180°
-    iterativeMaster::swapReorder(dude);
-    isoForms.push_back(dude);
-    iterativeMaster::invert(dude);
-    isoForms.push_back(dude);
-    // 270°
-    iterativeMaster::swapReorder(dude);
-    isoForms.push_back(dude);
-    iterativeMaster::invert(dude);
-    isoForms.push_back(dude);
-    return isoForms;
+    std::vector<std::vector<unsigned int>> isoForms;
+    for(int i = 0; i < v.size(); i++)
+    {
+        std::vector<unsigned int> solution = v[i];
+        iterativeMaster::invert(solution);
+        isoForms.push_back(solution);
+        // 90°
+        iterativeMaster::swapReorder(solution);
+        isoForms.push_back(solution);
+        iterativeMaster::invert(solution);
+        isoForms.push_back(solution);
+        // 180°
+        iterativeMaster::swapReorder(solution);
+        isoForms.push_back(solution);
+        iterativeMaster::invert(solution);
+        isoForms.push_back(solution);
+        // 270°
+        iterativeMaster::swapReorder(solution);
+        isoForms.push_back(solution);
+        iterativeMaster::invert(solution);
+        isoForms.push_back(solution);
+    }
+    v.insert(v.end(),isoForms.begin(),isoForms.end());
+    iterativeMaster::uniquifySolutions(v);
 }
 
 void iterativeMaster::invert(std::vector<unsigned int> & v)
@@ -184,4 +190,11 @@ void iterativeMaster::swapReorder(std::vector<unsigned int> & v)
   }
 
 }
+
+void iterativeMaster::uniquifySolutions(std::vector< std::vector<unsigned int >> & v)
+{
+    std::sort(v.begin(), v.end());
+    v.erase(std::unique(v.begin(), v.end()), v.end());
+}
+
 }
