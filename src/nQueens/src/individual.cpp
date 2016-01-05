@@ -7,7 +7,7 @@ namespace nQueens {
 
 //konstruktor nur mit Länge n
 //Bei der Init werden immer die gleichen hergestellt :-(  können wir das noch anders machen / oder ist das egal ?
-
+/*
 individual::individual(unsigned int n): n(n)
 {
     // create vector with elements [0,1,2...n]
@@ -15,9 +15,30 @@ individual::individual(unsigned int n): n(n)
     // init seed with our pointer in memory converted to int
     srand(int(this));
     // randomize the elements
-    for(unsigned int i = 0; i < n; i++) std::swap(v.at(i), v.at(rand()%n));
+    for(unsigned int i = 0; i < n; i++) std::swap(v.at(i), v.at(srand(int(this))%n));
     this->init();
 }
+*/
+individual::individual(unsigned int n)
+ {
+     int s = 0;
+     this->n = n;
+     for(int i=0;i<n;)
+     {
+         int c = rand() %n;
+         for(int w=0;w<v.size();w++)
+         {
+             if(c==v[w])s = 1;
+         }
+         if(s==0)
+         {
+             i++;
+             v.push_back(c);
+         }
+         else s = 0;
+     }
+     this->init();
+ }
 
 //Second constructor. n is the number of rows/genes, v is an already initialized vector of genes
 // thats why we dont need to create one
@@ -63,7 +84,7 @@ unsigned int individual::getScore()
 
 bool individual::isLocked()
 {
-    return this->isLocked();
+    return false;//this->isLocked();
 }
 
 std::vector<unsigned int> & individual::getVector()

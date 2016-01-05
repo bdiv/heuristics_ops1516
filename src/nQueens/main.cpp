@@ -48,20 +48,21 @@ void print(std::vector<std::vector <unsigned int> > solution,time_t timeIt,unsig
 int main()
 {
     //Init of Parameters
-    unsigned int    n=0;        //Size of Chessboard;
-    unsigned int    x=0;        //How many Individuals per Generation;
-    double          p=0.0;      //Probability of mutation;
-    unsigned int    sol=0;      //Which solve Methode
+    unsigned int    n=5;        //Size of Chessboard;
+    unsigned int    x=10;        //How many Individuals per Generation;
+    double          p=0.1;      //Probability of mutation;
+    unsigned int    sol=3;      //Which solve Methode
     unsigned int    i=0;        //Max Iteration;
     unsigned int    t=0;        //Time for Working;
     time_t          now;        //Time now for 3rd solve
     time_t          start;      //Time now for measure
     time_t          finish;     //Time after for measure
     time_t          timeIt;     //Time for how long it took
-    unsigned int    w=0;        //Which crossbread;
+    unsigned int    w=1;        //Which crossbread;
     nQueens::crossbreedFunctor * breed;     //Pointer for breed funktion
 
     std::string input = "";
+    /*
     //input n;
     while(true)
     {
@@ -121,13 +122,14 @@ int main()
         std::cout << "3: Until first solution; "    << std::endl;
         getline(std::cin,input);
         std::stringstream myStream(input);
-        if(myStream >> p)
+        if(myStream >> sol)
         {
             if(sol>0||sol<4)
             break;
         }
         std::cout << "Invalid" << std::endl;
     }
+    */
     //summary of Inputs
     std::cout << "Size = "          << n    << std::endl;
     std::cout << "Induviduen = "    << x    << std::endl;
@@ -136,9 +138,12 @@ int main()
 
     //Init of Population
     nQueens::iterativeMaster master(n,x,p);
+    master.getPopulation().printAll();
+    std::cout << "nach master erstellung " << std::endl;
     if(w==1)
     {
         breed = new nQueens::variation::matched_crossover();
+        std::cout << "Pointer erstellt " << std::endl;
     }
     else
     {
@@ -191,10 +196,12 @@ int main()
         break;
         case 3:
         {
+            std::cout << "switch case 3 " << std::endl;
             //Start of time measure
             start = time(NULL);
             //Solve until first solution
             master.solve((*breed));
+            std::cout << "nach solve " << std::endl;
             //Finish time measure
             finish = time(NULL);
             timeIt = difftime(start,finish);
@@ -205,6 +212,14 @@ int main()
     }
     //picking up solutions
     std::vector<std::vector <unsigned int> > solution = master.getSolutions();
+
+    //Testausgaben
+    std::cout << "Time diff = " << timeIt << std::endl;
+    std::cout << "size of solution = " << solution.size() << std::endl;
+
+    int test = 0;
+    std::cout << "mit enter weiter ";
+    getline(std::cin,input);
 
     //Call to print
     print(solution,timeIt,n);

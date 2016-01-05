@@ -50,6 +50,7 @@ void population::printAll()
 // grab a random dude out of the bag and throw it in the callers face
 individual& population::getRandomIndividual()
 {
+    std::cout << "Choose random parent" << std::endl;
     // choose a key at random
     unsigned int key = rand() % this->individuals.size()-1;
     // if the individual ist not locked, hence not engaged in intercourse
@@ -82,24 +83,29 @@ individual& population::getRandomIndividual()
 std::pair<individual&,individual&> population::chooseTwoRandom()
 {
     // we get one dude
-    individual parent1 = this->getRandomIndividual();
+    std::cout << "get parent 1" << std::endl;
+    individual& parent1 = this->getRandomIndividual();
     // we get another
-    individual parent2 = this->getRandomIndividual();
+    std::cout << "get parent 2" << std::endl;
+    individual& parent2 = this->getRandomIndividual();
     // they should not be the same dude
     while(parent1.getVector()==parent2.getVector())
     {
         // if they are, get another random dude
         parent2 = this->getRandomIndividual();
     }
+    std::cout << "got 2 random parents" << std::endl;
     // order them according to their score
     // simplifies some things later
     if(parent1.getScore() < parent2.getScore())
     {
+        std::cout << "triangle swap" << std::endl;
         // triangle swap
         individual temp = parent1;
         parent1 = parent2;
         parent2 = temp;
     }
+    std::cout << "peace out with parents" << std::endl;
     // tie up the dudes and throw them
     return std::pair<individual &, individual &>(parent1, parent2);
 }

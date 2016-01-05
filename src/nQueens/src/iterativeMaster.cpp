@@ -1,4 +1,5 @@
 #include "../include/iterativeMaster.h"
+#include<iostream>
 
 
 namespace nQueens {
@@ -87,6 +88,7 @@ unsigned int iterativeMaster::solve(std::time_t timeout, crossbreedFunctor & bre
         individual dude = breed(this->pop);
         // check the dude
         // scores equal 0 are solutions, scores > 0 are suboptimal
+
         if(dude.getScore() == 0)
         {
             // grab'n'sack the dude
@@ -103,11 +105,13 @@ unsigned int iterativeMaster::solve(std::time_t timeout, crossbreedFunctor & bre
 
 unsigned int iterativeMaster::solve(crossbreedFunctor & breed)
 {
+    std::cout << "sind in der Solve " << std::endl;
     // save number of current solutions
     unsigned int n = this->solutions.size();
     // while nothing changes
     while(n == this->solutions.size())
     {
+        std::cout << "in while schleife " << std::endl;
         // breed a dude
         // he'll automatically be in the population and replace the parent with
         // the lowest score
@@ -115,6 +119,7 @@ unsigned int iterativeMaster::solve(crossbreedFunctor & breed)
         this->variationCounter++;
         // check the dude
         // scores equal 0 are solutions, scores > 0 are suboptimal
+        std::cout << "Child score is: " << dude.getScore() << std::endl;
         if(dude.getScore() == 0)
         {
             // grab'n'sack the dude and it's isoForms

@@ -1,5 +1,6 @@
 #include "../include/variation.h"
 #include <algorithm>
+#include<iostream>
 
 namespace nQueens {
 variation::variation()
@@ -22,41 +23,47 @@ individual variation::matched_crossover::operator()(population & pop)
 {
     // initialization block...
     // choose two parents at random
+    std::cout << "Choose parents" << std::endl;
     std::pair<individual&, individual&> parents = pop.chooseTwoRandom();
     individual & parent1 = parents.first;
     individual & parent2 = parents.second;
-
+    std::cout << "got parents" << std::endl;
     // vectors all have the same size
     unsigned int n = parent1.getVector().size();
     // choose the area to work on -> this is a pair of vector entry keys: (startKey, endKey)
+    std::cout << "Choose area" << std::endl;
     std::pair<unsigned int, unsigned int> area = variation::chooseRandomArea(n);
     unsigned int start = area.first;
     unsigned int stop = area.second;
+    std::cout << "got area" << std::endl;
     // copy the vectors
     std::pair<individual, individual > children = generateChildren(parent1,parent2);
     // here we generate two children
     std::vector<unsigned int> child1 = children.first.getVector();
     std::vector<unsigned int> child2 = children.second.getVector();
     //....
-
+    std::cout << "generated children" << std::endl;
     // optimization for certain conditions (start = 0, stop = n;)
     if(start != 0 && stop != n-1)
     {
         // step through our area
+            std::cout << "start: " << start << "stop: " << stop << std::endl;
         for(unsigned int i = start; i <= stop; i++)
         {
             // if the vector entries are not equal
             if(child1.at(i) != child2.at(i))
             {
+                    std::cout << "we're at pos " << i << std::endl;
                 // step through vector of child2 with an iterator
                 // TODO: fix this, I think it'll work but i dont know the reaon for that iterator
                 // right now
-                std::vector<unsigned int>::iterator it = std::find(child2.begin(), child2.end(), child1.at(i));
+                //std::vector<unsigned int>::iterator it = std::find(child2.begin(), child2.end(), child1.at(i));
                 // note: I dont even use the iterator... wtf... seems that i just randomly stopped developing that
                 unsigned int temp = child1.at(i);
                 child1.at(i) = child2.at(i);
                 child2.at(i) = temp;
             }
+                std::cout << "done swapping" << std::endl;
             // else nothing todo bc entries are equal, switching them makes no sense
         }
     }
@@ -72,6 +79,7 @@ individual variation::matched_crossover::operator()(population & pop)
         // overwrite parent with best child
         parent1 = individual(n,child2);
     }
+    std::cout << "returning a child" << std::endl;
     return parent1;
 }
 
