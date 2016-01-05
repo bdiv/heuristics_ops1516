@@ -7,6 +7,44 @@
 #include"include/crossbreedFunctor.h"
 #include"include/iterativeMaster.h"
 
+void print(std::vector<std::vector <unsigned int> > solution,time_t timeIt,unsigned int n)
+{
+    std::string input;
+    unsigned int c = 0;                 //which choice
+    unsigned int s = solution.size();   //how many solutions
+
+    //Choice if in console or File
+    while(true)
+    {
+        std::cout << "Choose Output"    << std::endl;
+        std::cout << "1: Console "      << std::endl;
+        std::cout << "2: File (Same Folder) = ";
+        getline(std::cin,input);
+        std::stringstream myStream(input);
+        if(myStream >> c)
+        {
+            if(c>0 || c<3)
+            break;
+        }
+        std::cout << "Invalid" << std::endl;
+    }
+    if(c==1)
+    {
+        for(unsigned int x=0;x<s;x++)
+        {
+            for(unsigned int y=0;y<n;)
+            {
+                std::cout << solution[x][y] << ',';
+            }
+        }
+        std::cout << "Found " << s << "Solutions in: " << timeIt/60 << "." << std::endl;
+    }
+    else if(c==2)
+    {
+        //todo
+    }
+}
+
 int main()
 {
     //Init of Parameters
@@ -16,10 +54,12 @@ int main()
     unsigned int    sol=0;      //Which solve Methode
     unsigned int    i=0;        //Max Iteration;
     unsigned int    t=0;        //Time for Working;
-    time_t          now;        //Time now
+    time_t          now;        //Time now for 3rd solve
+    time_t          start;      //Time now for measure
+    time_t          finish;     //Time after for measure
+    time_t          timeIt;     //Time for how long it took
     unsigned int    w=0;        //Which crossbread;
-    std::vector<unsigned int> solution;
-    nQueens::crossbreedFunctor * breed;
+    nQueens::crossbreedFunctor * breed;     //Pointer for breed funktion
 
     std::string input = "";
     //input n;
@@ -115,12 +155,17 @@ int main()
                 std::cout << "Max Iterations = ";
                 getline(std::cin,input);
                 std::stringstream myStream(input);
-                if(myStream >> n)
+                if(myStream >> i)
                     break;
             }
             std::cout << "Invalid" << std::endl;
+            //Start of time measure
+            start = time(NULL);
             //Solve wich max
-            master.solve(n,(*breed));
+            master.solve(i,(*breed));
+            //Finish of time measure
+            finish = time(NULL);
+            timeIt = difftime(start,finish);
         }
         break;
         case 2:
@@ -136,22 +181,33 @@ int main()
             std::cout << "Invalid" << std::endl;
 
             //Time calculation
-            time_t now = time(NULL);
+            now = time(NULL);
             now = now + t*60;
             //Solve with time
             master.solve(now,(*breed));
+            //No time measure
+            timeIt = now;
         }
         break;
         case 3:
         {
+            //Start of time measure
+            start = time(NULL);
             //Solve until first solution
             master.solve((*breed));
+            //Finish time measure
+            finish = time(NULL);
+            timeIt = difftime(start,finish);
         }
         break;
         default:
         break;
     }
+    //picking up solutions
+    std::vector<std::vector <unsigned int> > solution = master.getSolutions();
 
+    //Call to print
+    print(solution,timeIt,n);
 
     return 0;
 }
