@@ -3,6 +3,7 @@
 #include "variation.h"
 #include "crossbreedFunctor.h"
 #include <ctime>
+#include <algorithm>
 namespace nQueens {
 
 class iterativeMaster
@@ -24,6 +25,9 @@ class iterativeMaster
         unsigned int solve(std::time_t timeout, crossbreedFunctor & breed);
         // solver that runs until we found another solution besides the ones we already have
         unsigned int solve(crossbreedFunctor & breed);
+        // public helper function to generate rotated and mirrored versions of a solution. They are unique and have a certain fixed order.
+        // this method will not keep the order you specified!!
+        static void generateIsoForms(std::vector<std::vector<unsigned int>> & v);
     protected:
     private:
         // containes the individuals
@@ -32,8 +36,6 @@ class iterativeMaster
         unsigned int variationCounter;
         // contains the solutions (score == 0)
         std::vector <std::vector<unsigned int>> solutions;
-        // private helper function to generate rotated and mirrored versions of a solution
-        static std::vector < std::vector <unsigned int> > generateIsoForms(individual & i);
         // invert a vector
         static void invert(std::vector <unsigned int> & v);
         /* swap and reaorder coordinates of our vector
@@ -48,6 +50,9 @@ class iterativeMaster
             so in essence: values will become keys and vice verca, additionally the new keys are sorted again
         */
         static void swapReorder(std::vector <unsigned int> & v);
+        // makes sure that there are no doubles in the solutions vector
+        // this will reorder the elements to ensure it. beware of that!
+        static void uniquifySolutions(std::vector< std::vector<unsigned int >> & v);
 };
 
 }
