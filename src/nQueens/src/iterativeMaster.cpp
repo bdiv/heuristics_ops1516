@@ -12,7 +12,7 @@ namespace nQueens {
 // simple constructor
 iterativeMaster::iterativeMaster(unsigned int n, unsigned int x, double pMutation): pop(population(n,x,pMutation))
 {
-
+    this->variationCounter= 0;
 }
 
 iterativeMaster::~iterativeMaster()
@@ -82,7 +82,7 @@ unsigned int iterativeMaster::solve(std::time_t timeout, crossbreedFunctor & bre
     while(now < timeout)
     {
         // breed a dude
-        // he'll automatically be in the population and replace the parent with
+        // he'll matically be in the population and replace the parent with
         // the lowest score
         individual dude = breed(this->pop);
         // check the dude
@@ -112,6 +112,7 @@ unsigned int iterativeMaster::solve(crossbreedFunctor & breed)
         // he'll automatically be in the population and replace the parent with
         // the lowest score
         individual dude = breed(this->pop);
+        this->variationCounter++;
         // check the dude
         // scores equal 0 are solutions, scores > 0 are suboptimal
         if(dude.getScore() == 0)
@@ -122,6 +123,7 @@ unsigned int iterativeMaster::solve(crossbreedFunctor & breed)
             std::vector<unsigned int> d;
             d.assign(dude.getVector().begin(),dude.getVector().end());
             this->solutions.push_back(d);
+            std::cout << "Counter: " << this->variationCounter << " Solutions: " << this->solutions.size() << std::endl;
         }
     }
 }
