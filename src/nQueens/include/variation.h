@@ -19,7 +19,7 @@ class variation
 {
     public:
         // static mutation function, bc mutation is easy and always the same
-        static void mutation(individual & i, double pMutation);
+        static void mutation(std::vector<unsigned int> & i, double pMutation);
 
 
         // Source: "Landscape analysis and efficient metaheuristics for solving the n-queens problem"
@@ -27,14 +27,14 @@ class variation
         class matched_crossover : public crossbreedFunctor
         {
             public:
-                individual operator() (population & pop) override;
+                std::vector<unsigned int> operator() (population & pop) override;
         };
         // Source: "Landscape analysis and efficient metaheuristics for solving the n-queens problem"
         // for the theory behind the implementation of:
         class ordered_crossover : public crossbreedFunctor
         {
             public:
-                individual operator() (population & pop) override;
+                std::vector<unsigned int> operator() (population & pop) override;
         };
 
         virtual ~variation();
@@ -42,10 +42,10 @@ class variation
     private:
         // private helper function for crossbreeding
         // chooses an area to be switched between the parents
-        static std::pair<unsigned int, unsigned int> chooseRandomArea(unsigned int n); // returns a pair(start, end) that describes an area in a vector
+        static std::pair<unsigned int, unsigned int> chooseRandomArea(unsigned int n, population & pop); // returns a pair(start, end) that describes an area in a vector
         // private helper function for crossbreeding
         // basically copies the vectors of the parents so we can work on them savely
-        static std::pair<individual, individual > generateChildren(individual & parent1, individual & parent2);
+        static std::pair<std::vector<unsigned int>, std::vector<unsigned int> > generateChildren(std::vector<unsigned int> & parent1, std::vector<unsigned int> & parent2);
         variation();
 };
 }

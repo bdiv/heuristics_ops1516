@@ -14,6 +14,7 @@ namespace nQueens {
 iterativeMaster::iterativeMaster(unsigned int n, unsigned int x, double pMutation): pop(population(n,x,pMutation))
 {
     this->variationCounter= 0;
+    this->checkPopulation(this->pop);
 }
 
 iterativeMaster::~iterativeMaster()
@@ -53,16 +54,14 @@ unsigned int iterativeMaster::solve(unsigned int maxVariations, crossbreedFuncto
         // use the crossbreedFunctor to create a new individual
         // he'll automatically be in the population and replace the parent with
         // the lowest score
-        individual dude = breed(this->pop);
+        std::vector<unsigned int> dude = breed(this->pop);
         // if score is 0 we have found a solution, scores > 0 are suboptimal
-        if(dude.getScore() == 0)
+        if(dude[dude.size()-1] == 0)
         {
             // grab and sack the dude
             //std::vector<std::vector<unsigned int>> isoForms = iterativeMaster::generateIsoForms(dude);
             //this->solutions.insert(this->solutions.end(), isoForms.begin(), isoForms.end());
-            std::vector<unsigned int> d;
-            d.assign(dude.getVector().begin(),dude.getVector().end());
-            this->solutions.push_back(d);
+            this->solutions.push_back(dude);
         }
     }
     // return number of solutions
@@ -85,18 +84,16 @@ unsigned int iterativeMaster::solve(std::time_t timeout, crossbreedFunctor & bre
         // breed a dude
         // he'll matically be in the population and replace the parent with
         // the lowest score
-        individual dude = breed(this->pop);
+        std::vector<unsigned int> dude = breed(this->pop);
         // check the dude
         // scores equal 0 are solutions, scores > 0 are suboptimal
 
-        if(dude.getScore() == 0)
+        if(dude[dude.size()-1] == 0)
         {
             // grab'n'sack the dude
             //std::vector<std::vector<unsigned int>> isoForms = iterativeMaster::generateIsoForms(dude);
             //this->solutions.insert(this->solutions.end(), isoForms.begin(), isoForms.end());
-            std::vector<unsigned int> d;
-            d.assign(dude.getVector().begin(),dude.getVector().end());
-            this->solutions.push_back(d);
+            this->solutions.push_back(dude);
         }
     }
     // return number of solutions found
@@ -105,30 +102,28 @@ unsigned int iterativeMaster::solve(std::time_t timeout, crossbreedFunctor & bre
 
 unsigned int iterativeMaster::solve(crossbreedFunctor & breed)
 {
-    std::cout << "sind in der Solve " << std::endl;
+
     // save number of current solutions
     unsigned int n = this->solutions.size();
     // while nothing changes
     while(n == this->solutions.size())
     {
-        std::cout << "in while schleife " << std::endl;
         // breed a dude
         // he'll automatically be in the population and replace the parent with
         // the lowest score
-        individual dude = breed(this->pop);
+        std::vector<unsigned int> dude = breed(this->pop);
         this->variationCounter++;
+        //std::cout << "Variation: " << this->variationCounter << std::endl;
+        if(this->variationCounter % 10 == 0) this->uniquifyPopulation(pop);
+        pop.printAll();
         // check the dude
         // scores equal 0 are solutions, scores > 0 are suboptimal
-        std::cout << "Child score is: " << dude.getScore() << std::endl;
-        if(dude.getScore() == 0)
+        if(dude[dude.size()-1] == 0)
         {
             // grab'n'sack the dude and it's isoForms
             //std::vector<std::vector<unsigned int>> isoForms = iterativeMaster::generateIsoForms(dude);
             //this->solutions.insert(this->solutions.end(), isoForms.begin(), isoForms.end());
-            std::vector<unsigned int> d;
-            d.assign(dude.getVector().begin(),dude.getVector().end());
-            this->solutions.push_back(d);
-            std::cout << "Counter: " << this->variationCounter << " Solutions: " << this->solutions.size() << std::endl;
+            this->solutions.push_back(dude);
         }
     }
 }
@@ -202,6 +197,29 @@ void iterativeMaster::uniquifySolutions(std::vector< std::vector<unsigned int >>
 {
     std::sort(v.begin(), v.end());
     v.erase(std::unique(v.begin(), v.end()), v.end());
+}
+
+void iterativeMaster::checkPopulation(population & pop)
+{
+  for(int i = 0; i < pop.getIndividuals().size(); i++)
+  {
+    if(pop.getIndividuals()[i][pop.getIndividuals()[0].size()-1] == 0) this->solutions.push_back(pop.getIndividuals()[i]);
+  }
+}
+
+void iterativeMaster::uniquifyPopulation(population & pop)
+{
+  std::vector<std::vector<unsigned int>>& individuals = pop.getIndividuals();
+  for(int i = 1; i < individuals.size()-1; i++)
+  {
+    if(std::equal(individuals[i].begin(), individuals[i].end(), individuals[i+1].begin()) ||
+       std::equal(individuals[i].begin(), individuals[i].end(), individuals[i-1].begin()))
+    {
+        //std::cout << "uniquify individual " << i << std::endl;
+        pop.generateRandomizedIndividual(individuals[i]);
+        pop.scoreIndividual(individuals[i]);
+    }
+  }
 }
 
 }

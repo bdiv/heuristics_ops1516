@@ -69,6 +69,26 @@ void print(std::vector<std::vector <unsigned int> > solution,time_t timeIt,unsig
 
 int main()
 {
+    /*
+    nQueens::crossbreedFunctor * br = new nQueens::variation::matched_crossover();
+    nQueens::iterativeMaster mast(100,10,0.1);
+    if(mast.getSolutions().size() == 0)
+    {
+        mast.solve((*br));
+    }
+    std::vector<std::vector<unsigned int>> solutions = mast.getPopulation().getIndividuals();
+    for(int i = 0; i < solutions.size(); i++)
+    {
+      for(int y = 0; y < solutions[i].size(); y++)
+      {
+        std::cout << solutions[i][y] << ", ";
+      }
+      std::cout << std::endl;
+
+    }
+
+    return 0;
+    */
     //Init of Parameters
     unsigned int    n=5;        //Size of Chessboard;
     unsigned int    x=10;        //How many Individuals per Generation;

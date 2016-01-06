@@ -30,6 +30,7 @@ class iterativeMaster
         static void generateIsoForms(std::vector<std::vector<unsigned int>> & v);
     protected:
     private:
+        void checkPopulation(population & pop);
         // containes the individuals
         population pop;
         // contains the number of variations during runtime/solving
@@ -53,6 +54,7 @@ class iterativeMaster
         // makes sure that there are no doubles in the solutions vector
         // this will reorder the elements to ensure it. beware of that!
         static void uniquifySolutions(std::vector< std::vector<unsigned int >> & v);
+        static void uniquifyPopulation(population & pop);
 };
 
 }
