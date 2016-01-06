@@ -1,6 +1,7 @@
 #include<iostream>
 #include<stdlib.h>
 #include<sstream>
+#include<fstream>
 #include<time.h>
 #include"include/population.h"
 #include"include/variation.h"
@@ -41,7 +42,28 @@ void print(std::vector<std::vector <unsigned int> > solution,time_t timeIt,unsig
     }
     else if(c==2)
     {
-        //todo
+        std::fstream datei("solutions.txt",std::ios::out);
+        for(unsigned int z=0;z<solution.size();z++)
+        {
+            datei << "Solution Nr: " << z+1 << std::endl;
+            for(int y=0;y<n;y++)
+            {
+                for(int x=0;x<n;x++)
+                {
+                    datei << "|";
+                    if(solution[z][y] == x)
+                    {
+                        datei << "x";
+                    }
+                    else
+                    {
+                        datei << "_";
+                    }
+                    datei << "|";
+                }
+                datei << "   " << solution[z][y] << std::endl;
+            }
+        }
     }
 }
 
@@ -60,6 +82,8 @@ int main()
     time_t          timeIt;     //Time for how long it took
     unsigned int    w=1;        //Which crossbread;
     nQueens::crossbreedFunctor * breed;     //Pointer for breed funktion
+
+    srand(time(NULL));
 
     std::string input = "";
     /*
