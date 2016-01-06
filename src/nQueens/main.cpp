@@ -69,8 +69,8 @@ void print(std::vector<std::vector <unsigned int> > solution,time_t timeIt,unsig
 
 int main()
 {
-    /*
-    nQueens::crossbreedFunctor * br = new nQueens::variation::matched_crossover();
+    // this works...
+    nQueens::crossbreedFunctor * br = new nQueens::variation::ordered_crossover();
     nQueens::iterativeMaster mast(100,10,0.1);
     if(mast.getSolutions().size() == 0)
     {
@@ -88,7 +88,7 @@ int main()
     }
 
     return 0;
-    */
+    /* this somehow doesnt work
     //Init of Parameters
     unsigned int    n=5;        //Size of Chessboard;
     unsigned int    x=10;        //How many Individuals per Generation;
@@ -106,7 +106,6 @@ int main()
     srand(time(NULL));
 
     std::string input = "";
-    /*
     //input n;
     while(true)
     {
@@ -173,7 +172,6 @@ int main()
         }
         std::cout << "Invalid" << std::endl;
     }
-    */
     //summary of Inputs
     std::cout << "Size = "          << n    << std::endl;
     std::cout << "Induviduen = "    << x    << std::endl;
@@ -182,12 +180,12 @@ int main()
 
     //Init of Population
     nQueens::iterativeMaster master(n,x,p);
-    master.getPopulation().printAll();
-    std::cout << "nach master erstellung " << std::endl;
+    // master.getPopulation().printAll();
+    //std::cout << "nach master erstellung " << std::endl;
     if(w==1)
     {
         breed = new nQueens::variation::matched_crossover();
-        std::cout << "Pointer erstellt " << std::endl;
+        //std::cout << "Pointer erstellt " << std::endl;
     }
     else
     {
@@ -207,7 +205,7 @@ int main()
                 if(myStream >> i)
                     break;
             }
-            std::cout << "Invalid" << std::endl;
+            //std::cout << "Invalid" << std::endl;
             //Start of time measure
             start = time(NULL);
             //Solve wich max
@@ -227,7 +225,7 @@ int main()
                 if(myStream >> t)
                     break;
             }
-            std::cout << "Invalid" << std::endl;
+            //std::cout << "Invalid" << std::endl;
 
             //Time calculation
             now = time(NULL);
@@ -240,12 +238,12 @@ int main()
         break;
         case 3:
         {
-            std::cout << "switch case 3 " << std::endl;
+            //std::cout << "switch case 3 " << std::endl;
             //Start of time measure
             start = time(NULL);
             //Solve until first solution
             master.solve((*breed));
-            std::cout << "nach solve " << std::endl;
+            //std::cout << "nach solve " << std::endl;
             //Finish time measure
             finish = time(NULL);
             timeIt = difftime(start,finish);
@@ -268,5 +266,5 @@ int main()
     //Call to print
     print(solution,timeIt,n);
 
-    return 0;
+    return 0; */
 }
