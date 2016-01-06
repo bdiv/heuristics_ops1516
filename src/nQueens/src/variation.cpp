@@ -39,7 +39,7 @@ std::vector<unsigned int> variation::matched_crossover::operator()(population & 
     std::vector<unsigned int> child2 = children.second;
     //....
     // optimization for certain conditions (start = 0, stop = n;)
-    if(start != 0 && stop != n-1)
+    if(start != 0 && stop != n-2)
     {
         // step through our area
         for(unsigned int i = start; i <= stop; i++)
@@ -99,7 +99,7 @@ std::vector<unsigned int> variation::ordered_crossover::operator()(population & 
     /*  if our range equals vector child1 we dont have to do anything at all. child1 equals parent1. We would completely overwrite
     *   overwrite child2 so that child1 == child2 and after that set parent1 = child2. Which is pointless.
     */
-    if(start > 0 && stop < n-1)
+    if(start > 0 && stop < n-2)
     {
         // step through our working area
         for(unsigned int i = start; i <= stop; i++)
@@ -107,7 +107,10 @@ std::vector<unsigned int> variation::ordered_crossover::operator()(population & 
             // well... this reads nice doesnt it?
             // here we search child2 for the element in child1 at position i
             // once found we erase it
+            std::cout << "segmentation fault: s:" << start << " e:" << stop << " n:" << n  << " i:" << i  << " child1: "
+            << child1.size() << " child2:" << child2.size() << std::endl;
             child2.erase(std::find(child2.begin(), child2.end(), (*(child1.begin()+i))));
+            std::cout << "after segment..." << std::endl;
         }
         // after all matching elements are erased in child2 we insert the working area from child1 into it
         // pushing back all elements that are in the way

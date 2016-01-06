@@ -55,6 +55,9 @@ unsigned int iterativeMaster::solve(unsigned int maxVariations, crossbreedFuncto
         // he'll automatically be in the population and replace the parent with
         // the lowest score
         std::vector<unsigned int> dude = breed(this->pop);
+        this->variationCounter++;
+        //std::cout << "Variation: " << this->variationCounter << std::endl;
+        if(this->variationCounter % 20 == 0) this->uniquifyPopulation(pop);
         // if score is 0 we have found a solution, scores > 0 are suboptimal
         if(dude[dude.size()-1] == 0)
         {
@@ -85,6 +88,9 @@ unsigned int iterativeMaster::solve(std::time_t timeout, crossbreedFunctor & bre
         // he'll matically be in the population and replace the parent with
         // the lowest score
         std::vector<unsigned int> dude = breed(this->pop);
+        this->variationCounter++;
+        //std::cout << "Variation: " << this->variationCounter << std::endl;
+        if(this->variationCounter % 20 == 0) this->uniquifyPopulation(pop);
         // check the dude
         // scores equal 0 are solutions, scores > 0 are suboptimal
 
@@ -114,8 +120,8 @@ unsigned int iterativeMaster::solve(crossbreedFunctor & breed)
         std::vector<unsigned int> dude = breed(this->pop);
         this->variationCounter++;
         //std::cout << "Variation: " << this->variationCounter << std::endl;
-        if(this->variationCounter % 10 == 0) this->uniquifyPopulation(pop);
-        pop.printAll();
+        if(this->variationCounter % 20 == 0) this->uniquifyPopulation(pop);
+        //pop.printAll();
         // check the dude
         // scores equal 0 are solutions, scores > 0 are suboptimal
         if(dude[dude.size()-1] == 0)
