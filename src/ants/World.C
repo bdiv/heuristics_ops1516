@@ -10,7 +10,7 @@ public:
 	double ** adjazenz; //  Adjazenzmatrix mit den Kantengewichten. Da die Kanten nicht gerichtet sind, ist die Matrix symmetrisch, d.h. a_ij = a_ji
 	double start; //Nummer des Startknotens für das shortest Path Problem
 	double ende; //Nummer des Endknotens für das shortest Path Problem. 
-	double m; //Anzahl der Ameisen
+	int m; //Anzahl der Ameisen
 	double ** pheromone; //Adjazenzmatrix mit den Pheromonleveln auf den einzelnen Kanten. Wie bei der Adjazenzmatrix mit den Kantengewichten (adjazenz), ist auch diese Matrix symmetrisch, also auch hier gilt: a_ij = a_ji
 	double * shortest_path; //Abfolge der Knotenreihenfolge des bisher kürzesten Weges
 	double shortest_path_hops; //Anzahl der Knoten von Start- bis Ziel
@@ -25,6 +25,7 @@ public:
 	double iterations; //Iterationen, die mit den Ameisen bereits durchlaufen wurden. Wenn alle Ameisen einen Pfad zum Ziel gefunden haben, ist eine Iteration abgeschlossen. Erst nach 3 Iterationen werden die Pheromone berücksichtigt. 
 	bool ** vi_edges; //Gibt an, ob Ameise schon auf Knoten war oder nicht; 
 	double * nodes; //Liste mit allen schon besuchten Knoten
+	Ant ameise [];
 
 	World(); //Konstruktor
 	~World(); //Offizieller Destruktor (ruft clear() auf)
@@ -51,6 +52,7 @@ World::World(){
 	tau_0 = 2;
 	rho = 0.3; 
 	m = 10; //Debugwert
+	Ant ameise [m];
 	iterations = 0; 
 
 }
@@ -98,7 +100,7 @@ World::sh_path(int n, double ** adjazenz, int start, int ende)
 	bool finished = false;
 	bool abort = false; 
 	bool Zielknotenerreicht = false; 
-	Ant ameise [(int)m];
+	
 
 	while (!finished && !abort)
 	{
@@ -199,6 +201,8 @@ int World::select_next_edge(int letzerKnoten, int aktuellerKnoten){
 
 World::update_pheromones(){
 
+	
+
 }
 World::evaporate(){
 
@@ -208,7 +212,6 @@ World::evaporate(){
 		{
 			pheromone [a] [b] = pheromone [a] [b] * (1 - rho); 
 			if(pheromone [a] [b] < tau_min) pheromone [a] [b] = tau_min;
-			//if(pheromone [a] [b] > tau_max) pheromone [a] [b] = tau_max; 
 		}
 	}
 }
@@ -228,6 +231,8 @@ World::print_sh_path(){
 int main(){
 
 	World * world = new World(); 
+
+
 
 
 	delete world;
