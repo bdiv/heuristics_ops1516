@@ -24,7 +24,7 @@ public:
 	double rho; //Geschwindigkeit, mit der Pheromone wieder verdampfen
 	double iterations; //Iterationen, die mit den Ameisen bereits durchlaufen wurden. Wenn alle Ameisen einen Pfad zum Ziel gefunden haben, ist eine Iteration abgeschlossen. Erst nach 3 Iterationen werden die Pheromone berücksichtigt. 
 	bool ** vi_edges; //Gibt an, ob Ameise schon auf Knoten war oder nicht; 
-	double * nodes; //Liste mit allen schon besuchten Knoten
+	bool * vi_nodes; //Liste mit allen schon besuchten Knoten
 	Ant ameise [];
 
 	World(); //Konstruktor
@@ -93,6 +93,8 @@ World::sh_path(int n, double ** adjazenz, int start, int ende)
 		{
 			vi_edges [a] = new bool [n]; 
 		}
+
+	vi_nodes = new bool [n]; 
 
 
 	//**************************************************** BERECHNEN ********************************************************************
