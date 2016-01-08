@@ -6,7 +6,7 @@ namespace nQueens {
 class crossbreedFunctor
 {
     public:
-        virtual individual operator() (population & pop) = 0;
+        virtual std::vector<unsigned int> operator() (population & pop) = 0;
     protected:
     private:
 
