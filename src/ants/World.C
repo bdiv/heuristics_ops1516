@@ -24,7 +24,8 @@ public:
 	double rho; //Geschwindigkeit, mit der Pheromone wieder verdampfen
 	int iterations; //Iterationen, die mit den Ameisen bereits durchlaufen wurden. Wenn alle Ameisen einen Pfad zum Ziel gefunden haben, ist eine Iteration abgeschlossen. Erst nach 3 Iterationen werden die Pheromone berücksichtigt. 
 	bool ** vi_edges; //Gibt an, ob Ameise schon auf Knoten war oder nicht; 
-	int * nodes; //Liste mit allen schon besuchten Knoten
+	bool * vi_nodes; //Liste mit allen schon besuchten Knoten
+	Ant ameise [];
 
 	World(); //Konstruktor
 	~World(); //Offizieller Destruktor (ruft clear() auf)
@@ -51,6 +52,7 @@ World::World(){
 	tau_0 = 2;
 	rho = 0.3; 
 	m = 10; //Debugwert
+	Ant ameise [m];
 	iterations = 0; 
 
 }
@@ -92,13 +94,15 @@ void World::sh_path(int n, double ** adjazenz, int start, int ende)
 			vi_edges [a] = new bool [n]; 
 		}
 
+	vi_nodes = new bool [n]; 
+
 
 	//**************************************************** BERECHNEN ********************************************************************
 
 	bool finished = false;
 	bool abort = false; 
 	bool Zielknotenerreicht = false; 
-	Ant ameise [m];
+
 
 	while (!finished && !abort)
 	{
@@ -122,59 +126,59 @@ void World::sh_path(int n, double ** adjazenz, int start, int ende)
 			}
 		}
 
-		//Verdunsten der vorhandenen Pheromone
-		evaporate(); 
+	//Verdunsten der vorhandenen Pheromone
+	evaporate(); 
 
-		/*Updaten der Pheromone anhand der Gewichtung 
-		der Wegstrecken, die die Ameisen zurückgelegt 
-		haben. (Kürzeste Strecken bekommen am Meisten
-		Pheromone)*/ 
-		update_pheromones();
+	/*Updaten der Pheromone anhand der Gewichtung 
+	der Wegstrecken, die die Ameisen zurückgelegt 
+	haben. (Kürzeste Strecken bekommen am Meisten
+	Pheromone)*/ 
+	update_pheromones();
 
-		//Kontrolle ob kürzester Pfad bereits gefunden wurde
-		if(iterations > 3 ){
+	//Kontrolle ob kürzester Pfad bereits gefunden wurde
+	if(iterations > 3 ){
 
-			double anteil_relativ = 0.8; 
-			//Berechnen des absoluten Anteils anhand unserer Populationsgröße:
-			int anteil_absolut = anteil_relativ * m;
-			//Aufrunden (wir möchten mindestens anteil_relativ Ameisen haben)
-			if (anteil_relativ * m - double(anteil_absolut) > 0)
-				++anteil_absolut;
+		double anteil_relativ = 0.8; 
+		//Berechnen des absoluten Anteils anhand unserer Populationsgröße:
+		int anteil_absolut = anteil_relativ * m;
+		//Aufrunden (wir möchten mindestens anteil_relativ Ameisen haben)
+		if (anteil_relativ * m - double(anteil_absolut) > 0)
+			++anteil_absolut;
 
-			int stop = m * (1 - anteil_relativ);
-			if (m * (1 - anteil_relativ) - double(stop) > 0)
-				++stop;
+		int stop = m * (1 - anteil_relativ);
+		if (m * (1 - anteil_relativ) - double(stop) > 0)
+			++stop;
 
-			for(int i = 0; i <= stop; i++)
+		for(int i = 0; i <= stop; i++)
+		{
+			int zaehler = 0;
+
+			for (int j = i+1; j < m ; ++j)
 			{
-				int zaehler = 0;
-
-				for (int j = i+1; j < m ; ++j)
+				//Beide Ameisen haben zumindest die selbe Weglänge zurückgelegt:
+				if (ameise[i].path_hops == ameise[j].path_hops) 
 				{
-					//Beide Ameisen haben zumindest die selbe Weglänge zurückgelegt:
-					if (ameise[i].path_hops == ameise[j].path_hops) 
+					bool gleich = true;
+					for (int k = 0; k < ameise[i].path_hops && gleich; ++k)
 					{
-						bool gleich = true;
-						for (int k = 0; k < ameise[i].path_hops && gleich; ++k)
-						{
-							if (ameise[i].path[k] != ameise[j].path[k])
-								gleich = false;
-						}
-
-						//sind alle Knoten am Weg der Ameise gleich, zähle weiter
-						if (gleich)
-							++zaehler;
+						if (ameise[i].path[k] != ameise[j].path[k])
+							gleich = false;
 					}
+
+					//sind alle Knoten am Weg der Ameise gleich, zähle weiter
+					if (gleich)
+						++zaehler;
 				}
-
-				//Haben xx% (Variable Anteil) der Ameisen den selben Weg gewählt,
-				//setzen wir finished auf TRUE, was zum Ende der while-Schleife führt
-
-				if (zaehler > anteil_absolut)
-					finished = true;
 			}
 
+			//Haben xx% (Variable Anteil) der Ameisen den selben Weg gewählt,
+			//setzen wir finished auf TRUE, was zum Ende der while-Schleife führt
+
+			if (zaehler > anteil_absolut)
+				finished = true;
 		}
+
+	}
 
 	}
 
@@ -196,6 +200,8 @@ int World::select_next_edge(int letzerKnoten, int aktuellerKnoten){
 
 void World::update_pheromones(){
 
+	
+
 }
 void World::evaporate(){
 
@@ -205,7 +211,6 @@ void World::evaporate(){
 		{
 			pheromone [a] [b] = pheromone [a] [b] * (1 - rho); 
 			if(pheromone [a] [b] < tau_min) pheromone [a] [b] = tau_min;
-			//if(pheromone [a] [b] > tau_max) pheromone [a] [b] = tau_max; 
 		}
 	}
 }
@@ -225,6 +230,8 @@ void World::print_sh_path(){
 int main(){
 
 	World * world = new World(); 
+
+
 
 
 	delete world;
