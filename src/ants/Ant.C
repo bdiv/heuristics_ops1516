@@ -6,7 +6,6 @@ class Ant{
 public:
 
 	int * path; //Abfolge der von der Ameise besuchten Knoten am aktuellen Pfad
-	int index; //Index für shortest_path
 	int path_hops; //Anzahl der von der Ameise besuchten Knoten am aktuellen Pfad
 	double path_length; //Länge des bisher von der Ameise zurückgelegten Weges am aktuellen Pfad
 
@@ -37,7 +36,6 @@ Ant::init(int dimension){
 Ant::knoten_hinzufuegen(double knoten, double kantenlaenge){
 
 	path_length += kantenlaenge; 
-	path[index++] = knoten; 
-	
+	path[++path_hops] = knoten; 	
 
 }
