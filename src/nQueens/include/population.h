@@ -26,7 +26,9 @@ class population
         std::vector<std::vector<unsigned int>> & getIndividuals();
         std::uniform_int_distribution<> randomIndividual;
         std::uniform_int_distribution<> randomPosition;
+        std::uniform_real_distribution<> randomMutation;
         std::mt19937 mt;
+        double getPMutation();
 
     private:
 

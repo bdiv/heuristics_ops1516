@@ -61,12 +61,17 @@ unsigned int iterativeMaster::solve(unsigned int maxVariations, crossbreedFuncto
         // if score is 0 we have found a solution, scores > 0 are suboptimal
         if(dude[dude.size()-1] == 0)
         {
-            // grab and sack the dude
-            //std::vector<std::vector<unsigned int>> isoForms = iterativeMaster::generateIsoForms(dude);
-            //this->solutions.insert(this->solutions.end(), isoForms.begin(), isoForms.end());
-            this->solutions.push_back(dude);
+            if(std::find(this->solutions.begin(), this->solutions.end(), dude) == this->solutions.end())
+            {
+                // grab and sack the dude
+                //std::vector<std::vector<unsigned int>> isoForms = iterativeMaster::generateIsoForms(dude);
+                //this->solutions.insert(this->solutions.end(), isoForms.begin(), isoForms.end());
+                this->solutions.push_back(dude);
+            }
         }
+        this->printStatus();
     }
+    std::cout << std::endl;
     // return number of solutions
     return this->solutions.size();
 }
@@ -96,12 +101,18 @@ unsigned int iterativeMaster::solve(std::time_t timeout, crossbreedFunctor & bre
 
         if(dude[dude.size()-1] == 0)
         {
-            // grab'n'sack the dude
-            //std::vector<std::vector<unsigned int>> isoForms = iterativeMaster::generateIsoForms(dude);
-            //this->solutions.insert(this->solutions.end(), isoForms.begin(), isoForms.end());
-            this->solutions.push_back(dude);
+            if(std::find(this->solutions.begin(), this->solutions.end(), dude) == this->solutions.end())
+            {
+                // grab'n'sack the dude
+                //std::vector<std::vector<unsigned int>> isoForms = iterativeMaster::generateIsoForms(dude);
+                //this->solutions.insert(this->solutions.end(), isoForms.begin(), isoForms.end());
+                this->solutions.push_back(dude);
+            }
         }
+        std::time(&now);
+        this->printStatus();
     }
+    std::cout << std::endl;
     // return number of solutions found
     return this->solutions.size();
 }
@@ -126,12 +137,18 @@ unsigned int iterativeMaster::solve(crossbreedFunctor & breed)
         // scores equal 0 are solutions, scores > 0 are suboptimal
         if(dude[dude.size()-1] == 0)
         {
-            // grab'n'sack the dude and it's isoForms
-            //std::vector<std::vector<unsigned int>> isoForms = iterativeMaster::generateIsoForms(dude);
-            //this->solutions.insert(this->solutions.end(), isoForms.begin(), isoForms.end());
-            this->solutions.push_back(dude);
+            if(std::find(this->solutions.begin(), this->solutions.end(), dude) == this->solutions.end())
+            {
+                // grab'n'sack the dude and it's isoForms
+                //std::vector<std::vector<unsigned int>> isoForms = iterativeMaster::generateIsoForms(dude);
+                //this->solutions.insert(this->solutions.end(), isoForms.begin(), isoForms.end());
+                this->solutions.push_back(dude);
+            }
         }
+        this->printStatus();
     }
+    std::cout << std::endl;
+    return this->solutions.size();
 }
 
 void iterativeMaster::generateIsoForms(std::vector<std::vector<unsigned int>> & v)
@@ -223,9 +240,19 @@ void iterativeMaster::uniquifyPopulation(population & pop)
     {
         //std::cout << "uniquify individual " << i << std::endl;
         pop.generateRandomizedIndividual(individuals[i]);
-        pop.scoreIndividual(individuals[i]);
+        individuals[i][individuals[i].size()-1] = pop.scoreIndividual(individuals[i]);
     }
   }
+}
+
+void iterativeMaster::printStatus()
+{
+    if(this->variationCounter % 200 == 0)
+    {
+        std::cout << '\r' << "Variations: " << this->variationCounter << " Solutions found: " << this->solutions.size() << std::flush;
+
+    }
+
 }
 
 }

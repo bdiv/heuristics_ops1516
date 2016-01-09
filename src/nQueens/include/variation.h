@@ -19,7 +19,7 @@ class variation
 {
     public:
         // static mutation function, bc mutation is easy and always the same
-        static void mutation(std::vector<unsigned int> & i, double pMutation);
+        static void mutation(std::vector<unsigned int> & i, population & pop);
 
 
         // Source: "Landscape analysis and efficient metaheuristics for solving the n-queens problem"
