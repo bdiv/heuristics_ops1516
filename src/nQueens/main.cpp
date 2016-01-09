@@ -8,11 +8,11 @@
 #include"include/crossbreedFunctor.h"
 #include"include/iterativeMaster.h"
 
-void print(std::vector<std::vector <unsigned int> > solution,time_t timeIt,unsigned int n)
+void print(std::vector<std::vector <unsigned int>> & solutions,time_t timeIt,unsigned int n)
 {
     std::string input;
     unsigned int c = 0;                 //which choice
-    unsigned int s = solution.size();   //how many solutions
+    unsigned int s = solutions.size();   //how many solutions
 
     //Choice if in console or File
     while(true)
@@ -33,25 +33,28 @@ void print(std::vector<std::vector <unsigned int> > solution,time_t timeIt,unsig
     {
         for(unsigned int x=0;x<s;x++)
         {
-            for(unsigned int y=0;y<n;)
+            for(unsigned int y=0;y<n;y++)
             {
-                std::cout << solution[x][y] << ',';
+                std::cout << solutions[x][y] << ',';
             }
+            std::cout << std::endl;
         }
-        std::cout << "Found " << s << "Solutions in: " << timeIt/60 << "." << std::endl;
+        std::cout << std::endl;
+        std::cout << "Found " << s << " Solutions in: " << timeIt/60 << " min." << std::endl;
     }
     else if(c==2)
     {
         std::fstream datei("solutions.txt",std::ios::out);
-        for(unsigned int z=0;z<solution.size();z++)
+        datei << "Found " << s << "Solutions in : " << timeIt/60 << " min." << std::endl;
+        for(unsigned int z=0;z<solutions.size();z++)
         {
             datei << "Solution Nr: " << z+1 << std::endl;
-            for(int y=0;y<n;y++)
+            for(unsigned int y=0;y<n;y++)
             {
-                for(int x=0;x<n;x++)
+                for(unsigned int x=0;x<n;x++)
                 {
                     datei << "|";
-                    if(solution[z][y] == x)
+                    if(solutions[z][y] == x)
                     {
                         datei << "x";
                     }
@@ -61,39 +64,21 @@ void print(std::vector<std::vector <unsigned int> > solution,time_t timeIt,unsig
                     }
                     datei << "|";
                 }
-                datei << "   " << solution[z][y] << std::endl;
+                datei << "   " << solutions[z][y] << std::endl;
             }
+            datei << "   " << std::endl;
         }
     }
 }
 
 int main()
 {
-    // this works...
-    nQueens::crossbreedFunctor * br = new nQueens::variation::ordered_crossover();
-    nQueens::iterativeMaster mast(100,10,0.1);
-    if(mast.getSolutions().size() == 0)
-    {
-        mast.solve((*br));
-    }
-    std::vector<std::vector<unsigned int>> solutions = mast.getPopulation().getIndividuals();
-    for(int i = 0; i < solutions.size(); i++)
-    {
-      for(int y = 0; y < solutions[i].size(); y++)
-      {
-        std::cout << solutions[i][y] << ", ";
-      }
-      std::cout << std::endl;
-
-    }
-
-    return 0;
-    /* this somehow doesnt work
     //Init of Parameters
-    unsigned int    n=5;        //Size of Chessboard;
-    unsigned int    x=10;        //How many Individuals per Generation;
-    double          p=0.1;      //Probability of mutation;
-    unsigned int    sol=3;      //Which solve Methode
+    int             test=0;     //To test if positiv;
+    unsigned int    n=0;        //Size of Chessboard;
+    unsigned int    x=0;        //How many Individuals per Generation;
+    double          p=0.0;      //Probability of mutation;
+    unsigned int    sol=0;      //Which solve Methode
     unsigned int    i=0;        //Max Iteration;
     unsigned int    t=0;        //Time for Working;
     time_t          now;        //Time now for 3rd solve
@@ -101,91 +86,110 @@ int main()
     time_t          finish;     //Time after for measure
     time_t          timeIt;     //Time for how long it took
     unsigned int    w=1;        //Which crossbread;
-    nQueens::crossbreedFunctor * breed;     //Pointer for breed funktion
-
-    srand(time(NULL));
+    nQueens::crossbreedFunctor * breed; //Pointer for breed function
 
     std::string input = "";
     //input n;
     while(true)
     {
-        std::cout << "Size of Chessboard (min 4) =";
+        std::cout << "Size of Chessboard (min 4) = ";
         getline(std::cin,input);
         std::stringstream myStream(input);
-        if(myStream >> n)
+        if(myStream >> test)
         {
-            if(n>3)
+            if(test>3)
             break;
         }
         std::cout << "Invalid" << std::endl;
     }
+    n = test;
+    test = 0;
+
     //input x;
     while(true)
     {
         std::cout << "Number of Individuals " << std::endl;
-        std::cout << "(Tipp: Small n big Number) = ";
+        std::cout << "Tipp: Small Chessboard, many Individuals  = ";
         getline(std::cin,input);
         std::stringstream myStream(input);
-        if(myStream >> x)
-            break;
-        std::cout << "Invalid" << std::endl;
-    }
-    //input p;
-    while(true)
-    {
-        std::cout << "Probability for Mutation " << std::endl;
-        std::cout << "(Tipp: Standard is 0.1) = ";
-        getline(std::cin,input);
-        std::stringstream myStream(input);
-        if(myStream >> p)
-            break;
-        std::cout << "Invalid" << std::endl;
-    }
-    //input breed
-    while(true)
-    {
-        std::cout << "Crosbreading Method  "    << std::endl;
-        std::cout << "1: Matched Crossover "    << std::endl;
-        std::cout << "2: Ordered Crossover = ";
-        getline(std::cin,input);
-        std::stringstream myStream(input);
-        if(myStream >> w)
+        if(myStream >> test)
         {
-            if(w>0||w<3)
+            if(test > 0)
             break;
         }
         std::cout << "Invalid" << std::endl;
     }
+    x = test;
+    test = 0;
+
+    //input p;
+    double dtest = 0.0;
+    while(true)
+    {
+        std::cout << "Probability for Mutation " << std::endl;
+        std::cout << "Between 0-1. 0.1 = 10%  = ";
+        getline(std::cin,input);
+        std::stringstream myStream(input);
+        if(myStream >> dtest)
+        {
+            if(dtest>0 && dtest<1)
+            break;
+        }
+        std::cout << "Invalid" << std::endl;
+    }
+    p = dtest;
+    dtest = 0;
+
+    //input breed
+    while(true)
+    {
+        std::cout << "Crosbreading Method  "    << std::endl;
+        std::cout << "1: Matched Crossover "    << std::endl;http://www.cplusplus.com/forum/beginner/103051/#msg554829
+        std::cout << "2: Ordered Crossover = ";
+        getline(std::cin,input);
+        std::stringstream myStream(input);
+        if(myStream >> test)
+        {
+            if(test>0||test<3)
+            break;
+        }
+        std::cout << "Invalid" << std::endl;
+    }
+    w = test;
+    test = 0;
+
     //solve Methode
     while(true)
     {
         std::cout << "Which solving Method: "       << std::endl;
         std::cout << "1: Until Max Iteration;"      << std::endl;
         std::cout << "2: Until Time out (in min); " << std::endl;
-        std::cout << "3: Until first solution; "    << std::endl;
+        std::cout << "3: Until first solution = ";
         getline(std::cin,input);
         std::stringstream myStream(input);
-        if(myStream >> sol)
+        if(myStream >> test)
         {
-            if(sol>0||sol<4)
+            if(test>0||test<4)
             break;
         }
         std::cout << "Invalid" << std::endl;
     }
+    sol = test;
+    test = 0;
+
     //summary of Inputs
     std::cout << "Size = "          << n    << std::endl;
     std::cout << "Induviduen = "    << x    << std::endl;
     std::cout << "Mutation = "      << p    << std::endl;
+    std::cout << "Breed Methode "   << w    << std::endl;
     std::cout << "Solve Methode = " << sol  << std::endl;
 
     //Init of Population
     nQueens::iterativeMaster master(n,x,p);
-    // master.getPopulation().printAll();
-    //std::cout << "nach master erstellung " << std::endl;
+
     if(w==1)
     {
         breed = new nQueens::variation::matched_crossover();
-        //std::cout << "Pointer erstellt " << std::endl;
     }
     else
     {
@@ -204,15 +208,15 @@ int main()
                 std::stringstream myStream(input);
                 if(myStream >> i)
                     break;
+                std::cout << "Invalid" << std::endl;
             }
-            //std::cout << "Invalid" << std::endl;
             //Start of time measure
             start = time(NULL);
             //Solve wich max
             master.solve(i,(*breed));
             //Finish of time measure
             finish = time(NULL);
-            timeIt = difftime(start,finish);
+            timeIt = difftime(finish,start);
         }
         break;
         case 2:
@@ -224,47 +228,47 @@ int main()
                 std::stringstream myStream(input);
                 if(myStream >> t)
                     break;
+                std::cout << "Invalid" << std::endl;
             }
-            //std::cout << "Invalid" << std::endl;
-
+            //Time meassure
+            start = time(NULL);
             //Time calculation
             now = time(NULL);
             now = now + t*60;
             //Solve with time
             master.solve(now,(*breed));
             //No time measure
-            timeIt = now;
+            finish = time(NULL);
+            timeIt = difftime(finish,start);
         }
         break;
         case 3:
         {
-            //std::cout << "switch case 3 " << std::endl;
             //Start of time measure
             start = time(NULL);
             //Solve until first solution
             master.solve((*breed));
-            //std::cout << "nach solve " << std::endl;
             //Finish time measure
             finish = time(NULL);
-            timeIt = difftime(start,finish);
+            timeIt = difftime(finish,start);
         }
         break;
         default:
         break;
     }
+
     //picking up solutions
-    std::vector<std::vector <unsigned int> > solution = master.getSolutions();
+    std::vector<std::vector<unsigned int>> solutions = master.getSolutions();
 
     //Testausgaben
-    std::cout << "Time diff = " << timeIt << std::endl;
-    std::cout << "size of solution = " << solution.size() << std::endl;
+    std::cout << "Time diff = " << timeIt/60 << "min"<< std::endl;
+    std::cout << "size of solution = " << solutions.size() << std::endl;
 
-    int test = 0;
     std::cout << "mit enter weiter ";
     getline(std::cin,input);
 
     //Call to print
-    print(solution,timeIt,n);
+    print(solutions,timeIt,n);
 
-    return 0; */
+    return 0;
 }

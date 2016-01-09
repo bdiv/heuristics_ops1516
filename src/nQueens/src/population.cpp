@@ -13,7 +13,10 @@ std::vector<std::vector<unsigned int>> & population::getIndividuals()
     return this->individuals;
 }
 
-
+double population::getPMutation()
+{
+    return this->pMutation;
+}
 
 //Konstruktor
 population::population(unsigned int n, unsigned int x, double pMutation) : n(n), pMutation(pMutation)
@@ -23,6 +26,7 @@ population::population(unsigned int n, unsigned int x, double pMutation) : n(n),
     this->mt = std::mt19937(r());
     this->randomIndividual = std::uniform_int_distribution<>(0,x-1);
     this->randomPosition = std::uniform_int_distribution<>(0,n-1);
+    this->randomMutation = std::uniform_real_distribution<>(0,1);
     for(unsigned int i = 0; i < x; i++)
     {
         std::vector<unsigned int> indi;
@@ -49,14 +53,6 @@ void population::scoreAll()
     {
         // score individual
         individuals[i][this->n] = this->scoreIndividual(individuals[i]);
-    }
-}
-
-void population::printAll()
-{
-    for(unsigned int i=0;i<this->individuals.size();i++)
-    {
-        this->printIndu(this->individuals[i]);
     }
 }
 

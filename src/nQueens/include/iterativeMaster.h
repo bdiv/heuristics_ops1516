@@ -55,6 +55,7 @@ class iterativeMaster
         // this will reorder the elements to ensure it. beware of that!
         static void uniquifySolutions(std::vector< std::vector<unsigned int >> & v);
         static void uniquifyPopulation(population & pop);
+        void printStatus();
 };
 
 }
