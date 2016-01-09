@@ -191,6 +191,52 @@ void World::sh_path(int n, double ** adjazenz, int start, int ende)
 
 double World::compute_coefficient(int i, int j){
 
+	if (pheromone[i][j] == 0)
+	{
+
+		if (vi_nodes[j] == false && vi_edges[i][j] == false)
+		{
+			return pow((1.0 / adjazenz[i][j]), alpha) * pow((1.0 + beta), 2.0);
+		}
+		if (vi_nodes[j] == true && vi_edges[i][j] == false)
+		{
+			return pow((1.0 / adjazenz[i][j]), alpha) * (1.0 + beta);
+		}
+		if (vi_nodes[j] == false && vi_edges[i][j] == true)
+		{
+			return pow((1.0 / adjazenz[i][j]), alpha) * (1.0 + beta);
+		}
+		else return pow((1.0 / adjazenz[i][j]), alpha);
+	}
+	else
+	{
+		if (iterations < 3)
+		{
+			return 0;
+		}
+
+		else
+		{
+			if (vi_nodes[j] == false && vi_edges[i][j] == false)
+			{
+				return pow(pheromone[i][j], alpha) * pow((1.0 + beta), 2.0);
+			}
+			if (vi_nodes[j] == true && vi_edges[i][j] == false)
+			{
+				return pow(pheromone[i][j], alpha) * (1.0 + beta);
+			}
+			if (vi_nodes[j] == false && vi_edges[i][j] == true)
+			{
+				return pow(pheromone[i][j], alpha) * (1.0 + beta);
+			}
+			else pow(pheromone[i][j], alpha);
+		}
+
+
+
+
+}
+
 
 }
 
