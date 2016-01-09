@@ -212,6 +212,9 @@ void World::sh_path(int n, double ** adjazenz, int start, int ende)
 
 double World::compute_coefficient(int i, int j){
 
+	i--; //Knoten auf Index aktualisieren
+	j--; //Knoten auf Index aktualisieren
+
 	if (pheromone[i][j] == 0)
 	{
 
