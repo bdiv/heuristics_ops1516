@@ -1,4 +1,7 @@
 #include <iostream>
+#include <stdlib.h>     
+#include <time.h> 
+#include <math.h>
 #include "Ant.C"
 using namespace std; 
 
@@ -39,7 +42,7 @@ public:
 	void evaporate(); //Funktion, die die vorhandenen Pheromone auf den Kanten wieder verdunsten lässt. Wäre der Pheromonlevel nach dem Verdunsten unter tau_min (1), wird der Wert auf 1 gesetzt. Die Funktion wird vor update_pheromones ausgeführt.
  	void update_pheromones(); //Nach einer Iteration (alle Ameisen finden einen Weg vom Start bis zum Ziel) werden die verschiedenen Wege miteinander verglichen. Über die Variable aktueller_pfad, die in jeder Ameise gespeichert ist, ergibt sich die Fitness der einzelnen Wege. Für den kürzesten Weg werden am Meisten Pheromone vergeben
  	void print_sh_path(); //Ausgabe des kürzesten gefundenen Weges in der Konsole 
-	
+	int randomize(); //Zufallsgenerator
 };
 
 
@@ -212,6 +215,9 @@ void World::sh_path(int n, double ** adjazenz, int start, int ende)
 
 double World::compute_coefficient(int i, int j){
 
+	i--; //Knoten auf Index aktualisieren
+	j--; //Knoten auf Index aktualisieren
+
 	if (pheromone[i][j] == 0)
 	{
 
@@ -316,6 +322,8 @@ int World::select_next_edge(Ant a){
 	//entscheide zufällig:
 	if (entscheide_zufaellig) {
 		//Generiere Zufallszahl:
+		srand(time(NULL));
+		int random = randomize(); 
 
 	}
 
@@ -351,6 +359,12 @@ void World::print_sh_path(){
 	{
 		cout << "Knoten [ " << a+1 << " ] = " << shortest_path[a] << endl;
 	}
+}
+
+int World::randomize()
+{
+	bool help = false;
+	return rand() % 10000 + !help;
 }
 
 
