@@ -11,8 +11,8 @@ public:
 
 	Ant();  
 	~Ant(); 
-	init(int dimension); //Initialisierung beim Aufruf der Ameise beim Suchen eines weiteren Weges vom Start zum Ziel (bereits besuchte Knoten 
-	knoten_hinzufuegen(double knoten, double kantenlaenge); //Jedesmal, wenn die Ameise einen Knoten weitergeht, wird über diese Methode der nächste Knoten und die Kantenlänge vom ursprünglichen Knoten zu diesem Knoten übergeben und dann in der Ameisenklasse gespeichert.
+	void init(int dimension); //Initialisierung beim Aufruf der Ameise beim Suchen eines weiteren Weges vom Start zum Ziel (bereits besuchte Knoten 
+	void knoten_hinzufuegen(double knoten, double kantenlaenge); //Jedesmal, wenn die Ameise einen Knoten weitergeht, wird über diese Methode der nächste Knoten und die Kantenlänge vom ursprünglichen Knoten zu diesem Knoten übergeben und dann in der Ameisenklasse gespeichert.
 
 }; 
 
@@ -24,7 +24,7 @@ Ant::~Ant(){
 	delete [] path; 
 }
 
-Ant::init(int dimension){
+void Ant::init(int dimension){
 
 	path = new int [dimension]; 
 	index = 0; 
@@ -33,7 +33,7 @@ Ant::init(int dimension){
 
 }
 
-Ant::knoten_hinzufuegen(double knoten, double kantenlaenge){
+void Ant::knoten_hinzufuegen(int knoten, double kantenlaenge){
 
 	path_length += kantenlaenge; 
 	path[++path_hops] = knoten; 	
