@@ -53,7 +53,7 @@ World::World(){
 	tau_0 = 2;
 	rho = 0.3; 
 	m = 10; //Debugwert
-	Ant ameise [m];
+	Ant ameise [10];
 	iterations = 0; 
 
 }
@@ -341,7 +341,35 @@ int World::select_next_edge(Ant a){
 
 void World::update_pheromones(){
 
-	
+	if (iterations == 0)
+	{
+		//Blinde Annahme dass 1. Ameise kürzeste Wegstrecke hat
+		shortest_path_length = ameise[0].path_length;
+		copy(ameise[0].path, ameise[0].path + n, shortest_path);
+		shortest_path_hops = shortest_path_length;
+	}
+
+	for (int a = 0; a < m; a++)
+	{
+		//1. Ameise in 1. Iteration hat bereits zuweisung
+		if (iterations == 0 && a == 0) continue;
+		//Finde kürzeste Wegstrecke aller Ameisen
+		if (ameise[a].path_length < shortest_path_length) shortest_path_length = ameise[a].path_length;
+	}
+
+	for (int a = 0; a < m; a++)
+	{
+		for (int b = 0; b < ameise[a].path_hops-1; b++)
+		{
+			int i, j; 
+
+			i = ameise[a].path[b]; 
+			j = ameise[a].path[b + 1]; 
+			//Lege Pheromone
+			pheromone[i - 1][j - 1] += (shortest_path_length / adjazenz[i - 1][j - 1]) * tau_neu_max;
+			pheromone[j - 1][i - 1] += (shortest_path_length / adjazenz[j - 1][i - 1]) * tau_neu_max;
+		}
+	}	
 
 }
 void World::evaporate(){
