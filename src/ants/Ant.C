@@ -32,7 +32,7 @@ void Ant::init(int dimension){
 
 }
 
-void Ant::knoten_hinzufuegen(double knoten, double kantenlaenge){
+void Ant::knoten_hinzufuegen(int knoten, double kantenlaenge){
 
 	path_length += kantenlaenge; 
 	path[++path_hops] = knoten; 	

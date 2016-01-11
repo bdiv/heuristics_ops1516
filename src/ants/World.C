@@ -23,7 +23,7 @@ public:
 	double tau_0; //Initialer Pheromonwert auf den Kanten des Graphen
 	double tau_min; //Minimaler Pheromonwert auf den Kanten des Graphen
 	double tau_max; //Maximaler Pheromonwert auf den Kanten des Graphen
-	double tau_neu_max; //
+	double tau_neu_max; //Maximaler additiver Pheromonwert auf den Kanten des Graphen (pro Iteration)
 	double rho; //Geschwindigkeit, mit der Pheromone wieder verdampfen
 	int iterations; //Iterationen, die mit den Ameisen bereits durchlaufen wurden. Wenn alle Ameisen einen Pfad zum Ziel gefunden haben, ist eine Iteration abgeschlossen. Erst nach 3 Iterationen werden die Pheromone berücksichtigt. 
 	bool ** vi_edges; //Gibt an, ob Ameise schon auf Knoten war oder nicht
@@ -209,7 +209,7 @@ void World::sh_path(int n, double ** adjazenz, int start, int ende)
 	}
 
 	//Ausgabe der Lösung in der Command Line:
-	print_sh_path(); 
+	print_sh_path();
 
 }
 
@@ -258,13 +258,7 @@ double World::compute_coefficient(int i, int j){
 			}
 			else pow(pheromone[i][j], alpha);
 		}
-
-
-
-
-}
-
-
+	}
 }
 
 int World::select_next_edge(Ant a){
