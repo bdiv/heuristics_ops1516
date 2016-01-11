@@ -27,7 +27,6 @@ Ant::~Ant(){
 void Ant::init(int dimension){
 
 	path = new int [dimension]; 
-	index = 0; 
 	path_hops = 0; 
 	path_length = 0; 
 
