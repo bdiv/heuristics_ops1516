@@ -28,7 +28,7 @@ public:
 	int iterations; //Iterationen, die mit den Ameisen bereits durchlaufen wurden. Wenn alle Ameisen einen Pfad zum Ziel gefunden haben, ist eine Iteration abgeschlossen. Erst nach 3 Iterationen werden die Pheromone berücksichtigt. 
 	bool ** vi_edges; //Gibt an, ob Ameise schon auf Knoten war oder nicht
 	bool * vi_nodes; //Liste mit allen schon besuchten Knoten
-	Ant ameise [];
+	Ant * ameise;
 
 	World(); //Konstruktor
 	~World(); //Offizieller Destruktor (ruft clear() auf)
@@ -53,7 +53,6 @@ World::World(){
 	tau_0 = 2;
 	rho = 0.3; 
 	m = 10; //Debugwert
-	Ant ameise [10];
 	iterations = 0; 
 
 }
@@ -100,6 +99,8 @@ void World::sh_path(int n, double ** adjazenz, int start, int ende)
 		}
 
 	vi_nodes = new bool [n]; 
+
+	ameise[m]; 
 
 
 	//**************************************************** BERECHNEN ********************************************************************
@@ -398,11 +399,11 @@ int World::randomize()
 
 int main(){
 
-	World * world = new World(); 
+	World world;  //= new World(); 
 
 
 
 
-	delete world;
+	
 	return 0;
 }

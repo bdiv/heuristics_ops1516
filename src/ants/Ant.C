@@ -9,14 +9,14 @@ public:
 	int path_hops; //Anzahl der von der Ameise besuchten Knoten am aktuellen Pfad
 	double path_length; //Länge des bisher von der Ameise zurückgelegten Weges am aktuellen Pfad
 
-	Ant();  
+	Ant() {};
 	~Ant(); 
 	void init(int dimension); //Initialisierung beim Aufruf der Ameise beim Suchen eines weiteren Weges vom Start zum Ziel (bereits besuchte Knoten 
-	void knoten_hinzufuegen(double knoten, double kantenlaenge); //Jedesmal, wenn die Ameise einen Knoten weitergeht, wird über diese Methode der nächste Knoten und die Kantenlänge vom ursprünglichen Knoten zu diesem Knoten übergeben und dann in der Ameisenklasse gespeichert.
+	void knoten_hinzufuegen(int knoten, double kantenlaenge); //Jedesmal, wenn die Ameise einen Knoten weitergeht, wird über diese Methode der nächste Knoten und die Kantenlänge vom ursprünglichen Knoten zu diesem Knoten übergeben und dann in der Ameisenklasse gespeichert.
 
 }; 
 
-Ant::Ant(){}
+//Ant::Ant(){}
 
 
 Ant::~Ant(){
