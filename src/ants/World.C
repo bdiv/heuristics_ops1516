@@ -287,9 +287,9 @@ int World::select_next_edge(Ant a){
 		if (zeile[i] > 0) {
 			//prüfen, ob die Ameise bereits auf diesem Knoten war:
 			bool bereits_besucht = false;
-			for (int j = 0; j < ameise[a].path_hops; ++j) {
+			for (int j = 0; j < ameise[i].path_hops; ++j) {
 				// (i + 1) --> weil die Knotennummern bei 1 zu zählen beginnen
-				if (ameise[a].path[j] == (i + 1))
+				if (ameise[i].path[j] == (i + 1))
 					bereits_besucht = true;
 			}
 			//wenn die Ameise noch nicht auf dem Knoten war --> berechnen 
