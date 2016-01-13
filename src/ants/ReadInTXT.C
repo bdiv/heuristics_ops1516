@@ -107,7 +107,7 @@ int Matrix::getDimension(){
 	return this->n; 
 }
 
-int main(){
+/*int main(){
 
 	Matrix matrix; 
 
@@ -117,5 +117,5 @@ int main(){
 	
 
 	return 0; 
-}
+}*/
 

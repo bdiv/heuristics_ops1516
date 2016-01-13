@@ -3,9 +3,9 @@
 #include <time.h> 
 #include <math.h>
 #include "Ant.C"
-using namespace std; 
+using namespace std;
 
-class World{
+class World {
 
 public:
 
@@ -38,36 +38,36 @@ public:
 
 	double compute_coefficient(int i, int j); //Berechnung des Koeffizienten zur Entscheidung, in welche Richtung die Ameise weiter geht (wird in Funktion select_next_edge() für jede der ausgehenden Kanten aufgerufen)
 	int select_next_edge(Ant a); //Auswahl des nächsten Knotens anhand des aktuellen Knotens, an dem sich eine Ameise befindet und dem Knoten, von dem sie gekommen ist. Nach dem Aufruf von compute_coefficient für jede Kante (außer jender, von der die Ameise gekommen ist) wird entschieden, zu welchem Knoten die Ameise weitergeht.
-						//Rückgabewert: Nächster Knoten
+								 //Rückgabewert: Nächster Knoten
 	void evaporate(); //Funktion, die die vorhandenen Pheromone auf den Kanten wieder verdunsten lässt. Wäre der Pheromonlevel nach dem Verdunsten unter tau_min (1), wird der Wert auf 1 gesetzt. Die Funktion wird vor update_pheromones ausgeführt.
- 	void update_pheromones(); //Nach einer Iteration (alle Ameisen finden einen Weg vom Start bis zum Ziel) werden die verschiedenen Wege miteinander verglichen. Über die Variable aktueller_pfad, die in jeder Ameise gespeichert ist, ergibt sich die Fitness der einzelnen Wege. Für den kürzesten Weg werden am Meisten Pheromone vergeben
- 	void print_sh_path(); //Ausgabe des kürzesten gefundenen Weges in der Konsole 
+	void update_pheromones(); //Nach einer Iteration (alle Ameisen finden einen Weg vom Start bis zum Ziel) werden die verschiedenen Wege miteinander verglichen. Über die Variable aktueller_pfad, die in jeder Ameise gespeichert ist, ergibt sich die Fitness der einzelnen Wege. Für den kürzesten Weg werden am Meisten Pheromone vergeben
+	void print_sh_path(); //Ausgabe des kürzesten gefundenen Weges in der Konsole 
 	int randomize(); //Zufallsgenerator
 };
 
 
-World::World(){
+World::World() {
 
-	alpha = 0.7; 
-	beta  = 0.3; 
+	alpha = 0.7;
+	beta = 0.3;
 	tau_0 = 2;
-	rho = 0.3; 
+	rho = 0.3;
 	m = 10; //Debugwert
 	ameise = new Ant[m];
-	iterations = 0; 
+	iterations = 0;
 
 }
 
-World::~World(){
+World::~World() {
 
 	clear();
 }
 
-void World::clear(){
+void World::clear() {
 
-	delete [] adjazenz; 
-	delete [] pheromone; 
-	delete [] vi_edges; 
+	delete[] adjazenz;
+	delete[] pheromone;
+	delete[] vi_edges;
 
 }
 
@@ -77,53 +77,53 @@ void World::sh_path(int n, double ** adjazenz, int start, int ende)
 	this->n = n;
 	this->start = start;
 	this->ende = ende;
-	
+
 	//**************************************************** ALLOZIEREN ********************************************************************
-	
-	adjazenz = new double* [n]; 
-		for(int a = 0; a < n; ++a)
-		{
-			adjazenz [a] = new double [n];
-		}
 
-	pheromone = new double* [n]; 
-		for(int a = 0; a < n; ++a)
-		{
-			pheromone [a] = new double [n];
-		}
+	adjazenz = new double*[n];
+	for (int a = 0; a < n; ++a)
+	{
+		adjazenz[a] = new double[n];
+	}
+
+	pheromone = new double*[n];
+	for (int a = 0; a < n; ++a)
+	{
+		pheromone[a] = new double[n];
+	}
 
 
-	vi_edges = new bool* [n]; 
-		for(int a = 0; a < n; ++a)
-		{
-			vi_edges [a] = new bool [n]; 
-		}
+	vi_edges = new bool*[n];
+	for (int a = 0; a < n; ++a)
+	{
+		vi_edges[a] = new bool[n];
+	}
 
-	vi_nodes = new bool [n]; 
+	vi_nodes = new bool[n];
 
 
 	//**************************************************** BERECHNEN ********************************************************************
 
 	bool finished = false;
-	bool abort = false; 
-	bool Zielknotenerreicht = false; 
+	bool abort = false;
+	bool Zielknotenerreicht = false;
 
 
 	while (!finished && !abort)
 	{
-		for(int a = 0; a < m; a++)
+		for (int a = 0; a < m; a++)
 		{
 			//Ameise initialisieren
-			ameise[a].init(n); 
-			Zielknotenerreicht = false; 
+			ameise[a].init(n);
+			Zielknotenerreicht = false;
 
 			//die aktuelle Position der Ameise auf den Startknoten stellen
 			int aktueller_Knoten = start;
 
 			//hinzufügen des Startknotens zu den besuchten Knoten der Ameise:
 			ameise[a].path[0] = start;
-			
-			while(!Zielknotenerreicht && !abort)
+
+			while (!Zielknotenerreicht && !abort)
 			{
 				int naechster_knoten = select_next_edge(ameise[a]);
 				if (naechster_knoten == 0) {
@@ -153,16 +153,16 @@ void World::sh_path(int n, double ** adjazenz, int start, int ende)
 		}
 
 		//Verdunsten der vorhandenen Pheromone
-		evaporate(); 
+		evaporate();
 
 		//Updaten der Pheromone anhand der Gewichtung der Wegstrecken, die die Ameisen 
 		//zurückgelegt haben. (Kürzeste Strecken bekommen am Meisten Pheromone)
 		update_pheromones();
 
 		//Kontrolle ob kürzester Pfad bereits gefunden wurde
-		if(iterations > 3 ){
+		if (iterations > 3) {
 
-			double anteil_relativ = 0.8; 
+			double anteil_relativ = 0.8;
 			//Berechnen des absoluten Anteils anhand unserer Populationsgröße:
 			int anteil_absolut = anteil_relativ * m;
 			//Aufrunden (wir möchten mindestens anteil_relativ Ameisen haben)
@@ -173,14 +173,14 @@ void World::sh_path(int n, double ** adjazenz, int start, int ende)
 			if (m * (1 - anteil_relativ) - double(stop) > 0)
 				++stop;
 
-			for(int i = 0; i <= stop; i++)
+			for (int i = 0; i <= stop; i++)
 			{
 				int zaehler = 0;
 
-				for (int j = i+1; j < m ; ++j)
+				for (int j = i + 1; j < m; ++j)
 				{
 					//Beide Ameisen haben zumindest die selbe Weglänge zurückgelegt:
-					if (ameise[i].path_hops == ameise[j].path_hops) 
+					if (ameise[i].path_hops == ameise[j].path_hops)
 					{
 						bool gleich = true;
 						for (int k = 0; k < ameise[i].path_hops && gleich; ++k)
@@ -213,7 +213,7 @@ void World::sh_path(int n, double ** adjazenz, int start, int ende)
 
 }
 
-double World::compute_coefficient(int i, int j){
+double World::compute_coefficient(int i, int j) {
 
 	i--; //Knoten auf Index aktualisieren
 	j--; //Knoten auf Index aktualisieren
@@ -256,12 +256,12 @@ double World::compute_coefficient(int i, int j){
 			{
 				return pow(pheromone[i][j], alpha) * (1.0 + beta);
 			}
-			else pow(pheromone[i][j], alpha);
+			else return pow(pheromone[i][j], alpha);
 		}
 	}
 }
 
-int World::select_next_edge(Ant a){
+int World::select_next_edge(Ant a) {
 
 	//Auslesen des aktuellen Knotens der Ameise:
 	int aktueller_Knoten = a.path[a.path_hops];
@@ -275,7 +275,7 @@ int World::select_next_edge(Ant a){
 	//Checken, an welchen Positionen ausgehende Kanten sind
 	//und prüfen, ob noch nicht besuchte Knoten noch vorhanden sind:
 
-	int naechster_knoten = 0; 
+	int naechster_knoten = 0;
 	double best = -1.0;
 
 	bool entscheide_zufaellig = false;
@@ -287,9 +287,9 @@ int World::select_next_edge(Ant a){
 		if (zeile[i] > 0) {
 			//prüfen, ob die Ameise bereits auf diesem Knoten war:
 			bool bereits_besucht = false;
-			for (int j = 0; j < ameise[a].path_hops; ++j) {
+			for (int j = 0; j < ameise[i].path_hops; ++j) {
 				// (i + 1) --> weil die Knotennummern bei 1 zu zählen beginnen
-				if (ameise[a].path[j] == (i + 1))
+				if (ameise[i].path[j] == (i + 1))
 					bereits_besucht = true;
 			}
 			//wenn die Ameise noch nicht auf dem Knoten war --> berechnen 
@@ -312,7 +312,7 @@ int World::select_next_edge(Ant a){
 						index = 0;
 						entscheide_zufaellig = true;
 					}
-					moegliche_knoten[++index] = i + 1;				
+					moegliche_knoten[++index] = i + 1;
 				}
 			}
 		}
@@ -323,7 +323,7 @@ int World::select_next_edge(Ant a){
 	if (entscheide_zufaellig) {
 		//Generiere Zufallszahl:
 		srand(time(NULL));
-		int random = randomize(); 
+		int random = randomize();
 		index = double(random / 10000.0) * double(index + 1);
 		naechster_knoten = moegliche_knoten[index];
 
@@ -335,7 +335,7 @@ int World::select_next_edge(Ant a){
 
 }
 
-void World::update_pheromones(){
+void World::update_pheromones() {
 
 	if (iterations == 0)
 	{
@@ -355,39 +355,39 @@ void World::update_pheromones(){
 
 	for (int a = 0; a < m; a++)
 	{
-		for (int b = 0; b < ameise[a].path_hops-1; b++)
+		for (int b = 0; b < ameise[a].path_hops - 1; b++)
 		{
-			int i, j; 
-	
-			i = ameise[a].path[b]; 
-			j = ameise[a].path[b + 1]; 
+			int i, j;
+
+			i = ameise[a].path[b];
+			j = ameise[a].path[b + 1];
 			//Lege Pheromone
 			pheromone[i - 1][j - 1] += (shortest_path_length / adjazenz[i - 1][j - 1]) * tau_neu_max;
 			pheromone[j - 1][i - 1] += (shortest_path_length / adjazenz[j - 1][i - 1]) * tau_neu_max;
 		}
-	}	
+	}
 
 }
-void World::evaporate(){
+void World::evaporate() {
 
-	for(int a = 0; a < n; a++)
+	for (int a = 0; a < n; a++)
 	{
-		for(int b = 0; b < n; b++)
+		for (int b = 0; b < n; b++)
 		{
-			pheromone [a] [b] = pheromone [a] [b] * (1 - rho); 
-			if(pheromone [a] [b] < tau_min) pheromone [a] [b] = tau_min;
+			pheromone[a][b] = pheromone[a][b] * (1 - rho);
+			if (pheromone[a][b] < tau_min) pheromone[a][b] = tau_min;
 		}
 	}
 }
 
-void World::print_sh_path(){
+void World::print_sh_path() {
 
-	cout << "*** Shortest Path *** " << endl << endl; 
+	cout << "*** Shortest Path *** " << endl << endl;
 
 
-	for(int a = 0; a < shortest_path_length; a++)
+	for (int a = 0; a < shortest_path_length; a++)
 	{
-		cout << "Knoten [ " << a+1 << " ] = " << shortest_path[a] << endl;
+		cout << "Knoten [ " << a + 1 << " ] = " << shortest_path[a] << endl;
 	}
 }
 
@@ -398,13 +398,12 @@ int World::randomize()
 }
 
 
-int main(){
+int main() {
 
-	World * world = new World(); 
-
-
+	World * world = new World();
 
 
-	delete world;
+
+
 	return 0;
 }
