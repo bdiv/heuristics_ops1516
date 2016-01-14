@@ -84,7 +84,7 @@ int main()
     time_t          now;        //Time now for 3rd solve
     time_t          start;      //Time now for measure
     time_t          finish;     //Time after for measure
-    time_t          timeIt;     //Time for how long it took
+    time_t          timeIt = time(NULL);     //Time for how long it took
     unsigned int    w=1;        //Which crossbread;
     nQueens::crossbreedFunctor * breed; //Pointer for breed function
 
@@ -144,7 +144,7 @@ int main()
     while(true)
     {
         std::cout << "Crosbreading Method  "    << std::endl;
-        std::cout << "1: Matched Crossover "    << std::endl;http://www.cplusplus.com/forum/beginner/103051/#msg554829
+        std::cout << "1: Matched Crossover "    << std::endl;
         std::cout << "2: Ordered Crossover = ";
         getline(std::cin,input);
         std::stringstream myStream(input);
