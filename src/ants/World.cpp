@@ -2,7 +2,7 @@
 #include <stdlib.h>     
 #include <time.h> 
 #include <math.h>
-#include "Ant.C"
+#include "Ant.cpp"
 using namespace std;
 
 class World {
@@ -399,11 +399,21 @@ int World::randomize()
 
 
 int main() {
+	cout << "Hello World!";
 
-	World * world = new World();
+	World world = new World();
 
+	int adjazenz[5][5] =
+	{
+		// 1	2	 3    4	   5
+		{ 0 ,  1 ,  0 ,  3 ,  4 },
+		{ 1 ,  0 ,  3 ,  0 ,  0 },
+		{ 0 ,  3 ,  0 ,  5 ,  0 },
+		{ 3 ,  0 ,  5 ,  0 ,  2 },
+		{ 4 ,  0 ,  0 ,  2 ,  0 }
+	};
 
-
+	delete world;
 
 	return 0;
 }
