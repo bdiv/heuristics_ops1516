@@ -3,6 +3,7 @@
 #include <time.h> 
 #include <math.h>
 #include "Ant.cpp"
+#include "ReadInTXT.cpp"
 using namespace std;
 
 class World {
@@ -77,14 +78,9 @@ void World::sh_path(int n, double ** adjazenz, int start, int ende)
 	this->n = n;
 	this->start = start;
 	this->ende = ende;
+	this->adjazenz = adjazenz;
 
 	//**************************************************** ALLOZIEREN ********************************************************************
-
-	adjazenz = new double*[n];
-	for (int a = 0; a < n; ++a)
-	{
-		adjazenz[a] = new double[n];
-	}
 
 	pheromone = new double*[n];
 	for (int a = 0; a < n; ++a)
@@ -401,19 +397,13 @@ int World::randomize()
 int main() {
 	cout << "Hello World!";
 
-	World world = new World();
+	Matrix read;
+		
+	double **adjazenz = read.getMatrix();
+	
+	World world;
 
-	int adjazenz[5][5] =
-	{
-		// 1	2	 3    4	   5
-		{ 0 ,  1 ,  0 ,  3 ,  4 },
-		{ 1 ,  0 ,  3 ,  0 ,  0 },
-		{ 0 ,  3 ,  0 ,  5 ,  0 },
-		{ 3 ,  0 ,  5 ,  0 ,  2 },
-		{ 4 ,  0 ,  0 ,  2 ,  0 }
-	};
-
-	delete world;
+	world.sh_path(5, adjazenz, 2, 5);
 
 	return 0;
 }

@@ -14,34 +14,34 @@ class Matrix {
 
 public: 
 
-	Matrix(); 
+	inline Matrix(); 
 	
 	//Change filename
-	void setpath(string path); 
+	void inline setpath(string path); 
 
 	//Return Matrix from txt
-	double ** getMatrix(); 
+	double inline ** getMatrix(); 
 
 	//Return Dimension
-	int getDimension(); 
+	int inline getDimension(); 
 
 
 };
 
-Matrix::Matrix()
+inline Matrix::Matrix()
 {
 	//Default
 	setpath("Matrix.txt"); 
 }
 
 
-void Matrix::setpath(string path){
+void inline Matrix::setpath(string path){
 
 	this->path = path; 
 
 }
 
-double ** Matrix::getMatrix(){
+double inline ** Matrix::getMatrix(){
 
 	//Read-in from file and generate Matrix 
 
@@ -101,7 +101,7 @@ double ** Matrix::getMatrix(){
 	return adjazenz; 
 }
 
-int Matrix::getDimension(){
+int inline Matrix::getDimension(){
 
 	//Return Dimension
 	return this->n; 
