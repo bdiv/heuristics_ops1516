@@ -154,7 +154,7 @@ unsigned int iterativeMaster::solve(crossbreedFunctor & breed)
 void iterativeMaster::generateIsoForms(std::vector<std::vector<unsigned int>> & v)
 {
     std::vector<std::vector<unsigned int>> isoForms;
-    for(int i = 0; i < v.size(); i++)
+    for(unsigned int i = 0; i < v.size(); i++)
     {
         std::vector<unsigned int> solution = v[i];
         iterativeMaster::invert(solution);
@@ -224,7 +224,7 @@ void iterativeMaster::uniquifySolutions(std::vector< std::vector<unsigned int >>
 
 void iterativeMaster::checkPopulation(population & pop)
 {
-  for(int i = 0; i < pop.getIndividuals().size(); i++)
+  for(unsigned int i = 0; i < pop.getIndividuals().size(); i++)
   {
     if(pop.getIndividuals()[i][pop.getIndividuals()[0].size()-1] == 0) this->solutions.push_back(pop.getIndividuals()[i]);
   }
@@ -233,7 +233,7 @@ void iterativeMaster::checkPopulation(population & pop)
 void iterativeMaster::uniquifyPopulation(population & pop)
 {
   std::vector<std::vector<unsigned int>>& individuals = pop.getIndividuals();
-  for(int i = 1; i < individuals.size()-1; i++)
+  for(unsigned int i = 1; i < individuals.size()-1; i++)
   {
     if(std::equal(individuals[i].begin(), individuals[i].end(), individuals[i+1].begin()) ||
        std::equal(individuals[i].begin(), individuals[i].end(), individuals[i-1].begin()))

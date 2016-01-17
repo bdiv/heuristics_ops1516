@@ -164,7 +164,7 @@ unsigned int population::scoreIndividual(std::vector<unsigned int> & v)
 void population::printIndu(std::vector<unsigned int> & v)
 {
     std::cout << "Position der Damen horizontal = ";
-    for(int i=0;i<this->n;i++)
+    for(unsigned int i=0;i<this->n;i++)
     {
         std::cout << v[i] << ",";
     }

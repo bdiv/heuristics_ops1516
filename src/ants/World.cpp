@@ -228,7 +228,7 @@ void World::sh_path(int n, double ** adjazenz, int start, int ende)
 				cout << pheromone[i][j] << "	";
 			}
 			cout << "\n";
-		}
+	}
 		cout << "----------------------------------------\n\n\n";
 		cout << "Weiterfuehren bestaetigen (0 = nein, alles andere = ja)";
 		int i;
