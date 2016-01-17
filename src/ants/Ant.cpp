@@ -35,6 +35,6 @@ void inline Ant::init(int dimension){
 void inline Ant::knoten_hinzufuegen(int knoten, double kantenlaenge){
 
 	path_length += kantenlaenge; 
-	path[++path_hops] = knoten; 	
+	path[++path_hops] = knoten; 
 
 }
