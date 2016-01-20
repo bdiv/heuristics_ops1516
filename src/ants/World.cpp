@@ -1,5 +1,6 @@
 #include <iostream>
 #include <stdlib.h>     
+#include <time.h>
 #include <time.h> 
 #include <math.h>
 #include "Ant.cpp"
@@ -30,12 +31,16 @@ public:
 	bool ** vi_edges; //Gibt an, ob Ameise schon auf Knoten war oder nicht
 	bool * vi_nodes; //Liste mit allen schon besuchten Knoten
 	Ant *ameise;
+	bool give_outputs;
+	bool stop_between_iterations;
 
-	World(); //Konstruktor
+	World(int n); //Konstruktor
 	~World(); //Offizieller Destruktor (ruft clear() auf)
 	void clear(); //Eigentlicher Destruktor
 
-	void sh_path(int n, double **adjazenz, int start, int ende); //Berechnung des shortest-paths
+	bool sh_path(int n, double ** adjazenz, int start, int ende,
+		double alpha, double beta, double rho, int m, bool give_outputs, 
+		bool stop_between_iterations); //Berechnung des shortest-paths
 
 	double compute_coefficient(int i, int j); //Berechnung des Koeffizienten zur Entscheidung, in welche Richtung die Ameise weiter geht (wird in Funktion select_next_edge() für jede der ausgehenden Kanten aufgerufen)
 	int select_next_edge(int a); //Auswahl des nächsten Knotens anhand des aktuellen Knotens, an dem sich eine Ameise befindet und dem Knoten, von dem sie gekommen ist. Nach dem Aufruf von compute_coefficient für jede Kante (außer jender, von der die Ameise gekommen ist) wird entschieden, zu welchem Knoten die Ameise weitergeht.
@@ -44,20 +49,33 @@ public:
 	void update_pheromones(); //Nach einer Iteration (alle Ameisen finden einen Weg vom Start bis zum Ziel) werden die verschiedenen Wege miteinander verglichen. Über die Variable aktueller_pfad, die in jeder Ameise gespeichert ist, ergibt sich die Fitness der einzelnen Wege. Für den kürzesten Weg werden am Meisten Pheromone vergeben
 	void print_sh_path(); //Ausgabe des kürzesten gefundenen Weges in der Konsole 
 	int randomize(); //Zufallsgenerator
+	unsigned long World::mix(unsigned long a, unsigned long b, unsigned long c); //Funktion zum Erzeugen des Randomwerts
 };
 
 
-World::World() {
+World::World(int n) {
 
+	//Initialisierung mit Defaultwerten
 	alpha = 0.3;
 	beta = 0.7;
-	tau_0 = 0;
+	tau_0 = 0.0;
 	tau_neu_max = 1;
 	rho = 0.3;
-	m = 2; //Debugwert
-	ameise = new Ant[m];
-	iterations = 0;
+	m = 5;
 
+	this->n = n;
+
+	pheromone = new double*[n];
+	for (int i = 0; i < n; ++i)
+		pheromone[i] = new double[n];
+
+	vi_edges = new bool*[n];
+	for (int i = 0; i < n; ++i)
+		vi_edges[i] = new bool[n];
+
+	vi_nodes = new bool[n];
+
+	shortest_path = new int[n];
 }
 
 World::~World() {
@@ -70,57 +88,57 @@ void World::clear() {
 	delete[] adjazenz;
 	delete[] pheromone;
 	delete[] vi_edges;
-
+	delete[] vi_nodes;
+	delete[] ameise;
 }
 
-void World::sh_path(int n, double ** adjazenz, int start, int ende)
-{
+bool World::sh_path(int n, double ** adjazenz, int start, int ende,		
+	double alpha, double beta, double rho, int m, bool give_outputs, 
+	bool stop_between_iterations) {
 	//Abspeichern der Übergabeparameter
-	this->n = n;
+	//n wird nicht mehr benötigt, da es schon im Konstruktor übergeben wird.
+	//this->n = n;
 	this->start = start;
 	this->ende = ende;
 	this->adjazenz = adjazenz;
+	this->alpha = alpha;
+	this->beta = beta;
+	this->rho = rho;
+	this->m = m;
+	this->give_outputs = give_outputs;
+	this->stop_between_iterations = stop_between_iterations;
 
-	//**************************************************** ALLOZIEREN ********************************************************************
-
-	pheromone = new double*[n];
+	//Initialisierung
+	ameise = new Ant[m];
+	iterations = 0;
+	
 	for (int i = 0; i < n; ++i)
-	{
-		pheromone[i] = new double[n];
 		for (int j = 0; j < n; ++j)
 			pheromone[i][j] = tau_0;
-	}
 
-
-	vi_edges = new bool*[n];
 	for (int i = 0; i < n; ++i)
-	{
-		vi_edges[i] = new bool[n];
 		for (int j = 0; j < n; ++j)
 			vi_edges[i][j] = false;
-	}
 
-	vi_nodes = new bool[n];
 	for (int i = 0; i < n; ++i)
 		vi_nodes[i] = false;
 
-	shortest_path = new int[n];
-
-	//**************************************************** BERECHNEN ********************************************************************
-
 	bool finished = false;
-	bool abort = false;
 	bool Zielknotenerreicht = false;
+	char abfrage;
 
-
-	while (!finished && !abort)
+	while (!finished)
 	{
 		for (int a = 0; a < m; a++)
 		{
 			//Ameise initialisieren
-			cout << "Ameise " << a + 1 << ", Iteration " << iterations << ":\n";
+			if (give_outputs)
+				cout << "Ameise " << a + 1 << ", Iteration " << iterations << ":\n";
 			ameise[a].init(n);
 			Zielknotenerreicht = false;
+
+			//Zaehler für Neuinitialisierungen:
+			int neuinitialisierungen = 0;
 
 			//die aktuelle Position der Ameise auf den Startknoten stellen
 			int aktueller_Knoten = start;
@@ -128,17 +146,25 @@ void World::sh_path(int n, double ** adjazenz, int start, int ende)
 			//hinzufügen des Startknotens zu den besuchten Knoten der Ameise:
 			ameise[a].path[0] = start;
 
-			while (!Zielknotenerreicht && !abort)
+			while (!Zielknotenerreicht)
 			{
 				int naechster_knoten = select_next_edge(a);
+
 				if (naechster_knoten == 0) {
-					cout << "Ameise kann nicht mehr weitergehen --> Neuinitialisierung.\n\n";
+					if (give_outputs)
+						cout << "Ameise kann nicht mehr weitergehen (nur noch bereits besuchte Knoten stehen zur Auswahl) --> Neuinitialisierung.\n\n";
+					++neuinitialisierungen;
+
+					//Wurde bereits mehrere Male Neuinitialisiert --> breche ab
+					if (neuinitialisierungen == 100)
+						return false;
 					ameise[a].init(n);
 					aktueller_Knoten = start;
 					ameise[a].path[0] = start;
 				}
 				else {
-					cout << "Stehe in Knoten " << aktueller_Knoten << " und gehe jetzt zu Knoten " << naechster_knoten << " weiter.\n\n";
+					if (give_outputs)
+						cout << "Stehe in Knoten " << aktueller_Knoten << " und gehe jetzt zu Knoten ---> " << naechster_knoten << " <--- weiter.\n\n";
 					double kantenlaenge = adjazenz[aktueller_Knoten - 1][naechster_knoten - 1];
 
 					ameise[a].knoten_hinzufuegen(naechster_knoten, kantenlaenge);
@@ -160,7 +186,10 @@ void World::sh_path(int n, double ** adjazenz, int start, int ende)
 					//prüfen, ob die Ameise den Zielknoten erreicht hat:
 					if (aktueller_Knoten == ende) {
 						Zielknotenerreicht = true;
-						cout << "Ameise " << a + 1 << " hat den Zielknoten erreicht! :) \n\n";
+						if (give_outputs) {
+							cout << "Ameise " << a + 1 << " hat den Zielknoten erreicht! :) \n";
+							cout << "Die zurueckgelegte Wegstrecke war " << ameise[a].path_length << "\n\n\n";
+						}
 					}
 				}
 			}
@@ -188,9 +217,9 @@ void World::sh_path(int n, double ** adjazenz, int start, int ende)
 			if (m * (1 - anteil_relativ) - double(stop) > 0)
 				++stop;
 
-			for (int i = 0; i <= stop; i++)
+			for (int i = 0; i <= stop && !finished; i++)
 			{
-				int zaehler = 0;
+				int zaehler = 1;
 
 				for (int j = i + 1; j < m; ++j)
 				{
@@ -209,37 +238,38 @@ void World::sh_path(int n, double ** adjazenz, int start, int ende)
 							++zaehler;
 					}
 				}
-
 				//Haben xx% (Variable Anteil) der Ameisen den selben Weg gewählt,
 				//setzen wir finished auf TRUE, was zum Ende der while-Schleife führt
-
-				if (zaehler > anteil_absolut)
+				if (zaehler >= anteil_absolut) {
 					finished = true;
+					if (give_outputs)
+						cout << "Abbruchbedingung erreicht. " << int(double(zaehler/m) * 100) << "% der Ameisen gehen den selben Weg.\n\n";
+				}
 			}
-
-		}
+		}		
 
 		//Weitere Iteration abgeschlossen
 		++iterations;
-		cout << iterations << ". Iteration abgeschlossen! :D \n";
-		cout << "Ausgabe der updadateten Pheromonlevel:\n";
-		for (int i = 0; i < n; ++i) {
-			for (int j = 0; j < n; ++j) {
-				cout << pheromone[i][j] << "	";
+
+		if (!finished) {
+			if (give_outputs) {
+				cout << iterations << ". Iteration abgeschlossen! :D \n";
+				cout << "Ausgabe der updadateten Pheromonlevel:\n";
+				for (int i = 0; i < n; ++i) {
+					for (int j = 0; j < n; ++j) {
+						cout << pheromone[i][j] << "	";
+					}
+					cout << "\n";
+				}
+				cout << "----------------------------------------\n\n\n";
+				if (stop_between_iterations) {
+					cout << "Weiterfuehren bestaetigen (beliebiges Zeichen eingeben) ";
+					cin >> abfrage;
+				}
 			}
-			cout << "\n";
+		}
 	}
-		cout << "----------------------------------------\n\n\n";
-		cout << "Weiterfuehren bestaetigen (0 = nein, alles andere = ja)";
-		int i;
-		cin >> i;
-		if (i == 0)
-			finished = true;
-	}
-
-	//Ausgabe der Lösung in der Command Line:
-	print_sh_path();
-
+	return true;
 }
 
 double World::compute_coefficient(int i, int j) {
@@ -249,7 +279,8 @@ double World::compute_coefficient(int i, int j) {
 
 	if (pheromone[i][j] == 0)
 	{
-		cout << "Berechne Alternativen Pheromonlevel...\n";
+		if (give_outputs)
+			cout << "Berechne Alternativen Pheromonlevel...\n";
 
 		if (vi_nodes[j] == false && vi_edges[i][j] == false)
 		{
@@ -274,7 +305,8 @@ double World::compute_coefficient(int i, int j) {
 
 		else
 		{
-			cout << "Berechne Koeffizient anhand des Pheromonlevels. Pheromone von Knoten " << i << " in Richtung Knoten " << j << " betragen: " << pheromone[i - 1][j - 1] << ".\n";
+			if (give_outputs)
+				cout << "Berechne Koeffizient anhand des Pheromonlevels. Pheromone betragen: " << pheromone[i][j] << ".\n";
 
 			if (vi_nodes[j] == false && vi_edges[i][j] == false)
 			{
@@ -327,8 +359,11 @@ int World::select_next_edge(int a) {
 			//wenn die Ameise noch nicht auf dem Knoten war --> berechnen 
 			//des Kantengewichts mit Hilfe von compute_coefficient:
 			if (!bereits_besucht) {
+				if (give_outputs)
+					cout << "Pruefe Kante in Richtung Knoten " << i + 1 << "\n";
 				double current = compute_coefficient(aktueller_Knoten, (i + 1));
-				cout << "Pruefe Kante in Richtung Knoten " << i + 1 << ". Berechneter Koeffizient: " << current << "\n";
+				if (give_outputs)
+					cout << "Berechneter Koeffizient: " << current << "\n";
 				//prüfen, ob der aktuelle coefficient besser ist, als der bisher ermittelte:
 				if (current > best) {
 					best = current;
@@ -354,14 +389,15 @@ int World::select_next_edge(int a) {
 	//ist eine Entscheidung zwischen mehreren möglichen Knoten zu treffen,
 	//entscheide zufällig:
 	if (entscheide_zufaellig) {
-		cout << "Muss Zufaellig entscheiden...";
+		if (give_outputs)
+			cout << "Muss Zufaellig entscheiden...";
 		//Generiere Zufallszahl:
 		srand(time(NULL));
 		int random = randomize();
-		cout << "Zufallswert = " << random << "\n";
 		index = double(random / 10000.0) * double(index + 1);
 		naechster_knoten = moegliche_knoten[index];
-		cout << " und habe mich fuer Knoten " << naechster_knoten << " entschieden.\n";
+		if (give_outputs)
+			cout << " und habe mich fuer Knoten " << naechster_knoten << " entschieden.\n";
 
 	}
 
@@ -386,24 +422,29 @@ void World::update_pheromones() {
 		//1. Ameise in 1. Iteration hat bereits zuweisung
 		if (iterations == 0 && a == 0) continue;
 		//Finde kürzeste Wegstrecke aller Ameisen
-		if (ameise[a].path_length < shortest_path_length) {
+		if (ameise[a].path_length < shortest_path_length 
+			|| (ameise[a].path_length == shortest_path_length && shortest_path_hops < ameise[a].path_hops)) {
 			shortest_path_length = ameise[a].path_length;
 			copy(ameise[a].path, ameise[a].path + n, shortest_path);
 			shortest_path_hops = ameise[a].path_hops;
 		}
 	}
+	if (give_outputs)
+		cout << "shortest_path_length = " << shortest_path_length << "\n";
+	for (int a = 0; a < m; a++)	{
 
-	for (int a = 0; a < m; a++)
-	{
+		//Lege Pheromone
+		double additiver_pheromonlevel = (double(shortest_path_length) / double(ameise[a].path_length)) * tau_neu_max;
+		if (give_outputs) {
+			cout << "path_length von Ameise " << a + 1 << " betraegt: " << ameise[a].path_length << "\n";
+			cout << "Der additive Pheromonlevel betragegt: " << additiver_pheromonlevel << "\n";
+		}
+
 		for (int b = 0; b < ameise[a].path_hops; b++)
 		{
 			int i = ameise[a].path[b];
 			int j = ameise[a].path[b + 1];
-			//Lege Pheromone
-			double additiver_pheromonlevel = (double(shortest_path_length) / double(ameise[a].path_length)) * tau_neu_max;
-			cout << "shortest_path_length = " << shortest_path_length << "\n";
-			cout << "path_length von Ameise " << a + 1 << " betraegt: " << ameise[a].path_length << "\n";
-			cout << "Der additive Pheromonlevel fuer Kante " << i << "-" << j << " betragegt: " << additiver_pheromonlevel << "\n";
+		
 			pheromone[i - 1][j - 1] += additiver_pheromonlevel;
 			pheromone[j - 1][i - 1] += additiver_pheromonlevel;
 		}
@@ -424,32 +465,238 @@ void World::evaporate() {
 
 void World::print_sh_path() {
 
-	cout << "*** Shortest Path *** " << endl << endl;
+	cout << "Zurueckgelegte Laenge: " << shortest_path_length << "\n\n";
 
-
-	for (int a = 0; a < shortest_path_length; a++)
+	cout << "Abfolge der Knoten (inklusive Start- und Endknoten):\n";
+	for (int a = 0; a <= shortest_path_hops; a++)
 	{
-		cout << "Knoten [ " << a + 1 << " ] = " << shortest_path[a] << endl;
+		cout << "Knoten [" << a + 1 << "] = " << shortest_path[a] << endl;
 	}
+	cout << "\n\n";
 }
 
 int World::randomize()
 {
-	bool help = false;
-	return rand() % 10000 + !help;
+	//srand(time(NULL));
+	//return rand() % 10000;
+	unsigned long seed = mix(clock(), time(NULL), 1147483647);
+	seed = seed % 10000;
+	if (seed < 0)
+		seed = seed * -1;
+	return int(seed);
+}
+
+unsigned long World::mix(unsigned long a, unsigned long b, unsigned long c)
+{
+	a = a - b;  a = a - c;  a = a ^ (c >> 13);
+	b = b - c;  b = b - a;  b = b ^ (a << 8);
+	c = c - a;  c = c - b;  c = c ^ (b >> 13);
+	a = a - b;  a = a - c;  a = a ^ (c >> 12);
+	b = b - c;  b = b - a;  b = b ^ (a << 16);
+	c = c - a;  c = c - b;  c = c ^ (b >> 5);
+	a = a - b;  a = a - c;  a = a ^ (c >> 3);
+	b = b - c;  b = b - a;  b = b ^ (a << 10);
+	c = c - a;  c = c - b;  c = c ^ (b >> 15);
+	return c;
 }
 
 
 int main() {
-	cout << "Hello World!";
-
 	Matrix read;
-		
+
 	double **adjazenz = read.getMatrix();
+	int dimension = read.getDimension();
+	cout << "Dimension = " << dimension << "\n";
 	
-	World world;
+	World world(dimension);
 
-	world.sh_path(5, adjazenz, 2, 5);
+	cout << "Wilkommen beim Shortest Path Problem Solver durch den Ameisenalgorithmus!\n";
+	cout << "-------------------------------------------------------------------------\n\n";
 
-	return 0;
+	bool programm_laufen_lassen = true;
+	
+	while (programm_laufen_lassen) {
+		int start = 0;
+		cout << "Startknoten:\n";
+		cout << "-------------------\n";
+		cout << "Bitte den Startknoten eingeben (erster Knoten = 1).\n";
+		while (start <= 0 || start > dimension) {
+			cout << "Eingabe: ";
+			if (!(cin >> start) || start == 0) {
+				cout << "\nFalsche Eingabe!\n";
+				cin.clear();
+				while (cin.get() != '\n');
+			}
+			else if (start <= 0 || start > dimension)
+				cout << "\nEingegebener Wert liegt nicht im Wertebereich  [1," << dimension << "] !\n";
+		}
+		cout << "\n\n";
+
+		int stop = 0;
+		cout << "Zielknoten:\n";
+		cout << "-------------------\n";
+		cout << "Bitte den Zielknoten eingeben (erster Knoten = 1).\n";
+		while (stop <= 0 || stop > dimension) {
+			cout << "Eingabe: ";
+			if (!(cin >> stop) || stop == 0) {
+				cout << "\nFalsche Eingabe!\n";
+				cin.clear();
+				while (cin.get() != '\n');
+			}
+			else if (stop <= 0 || stop > dimension)
+				cout << "\nEingegebener Wert liegt nicht im Wertebereich  [1," << dimension << "] !\n";
+		}
+		cout << "\n\n";
+
+		bool exit = false;
+
+		while (!exit) {
+			cout << "Im folgenden koennen die Parameter definiert werden:\n\n";
+			double alpha = 0.0;
+			cout << "Alpha:\n";
+			cout << "------\n";
+			cout << "Alpha ist der Einfluss der Pheromone bei der Wahl des naechsten Knotens "
+				<< "und liegt im Bereich ]0,1[. Defaultwert ist 0.3\n";
+			while (alpha <= 0 || alpha >= 1) {
+				cout << "Eingabe von Alpha: ";
+				if (!(cin >> alpha) || alpha == 0) {
+					cout << "\nFalsche Eingabe!\n";
+					cin.clear();
+					while (cin.get() != '\n');
+				}
+				else if (alpha <= 0 || alpha >= 1)
+					cout << "\nEingegebener Wert liegt nicht im Wertebereich ]0,1[ !\n";
+			}
+			cout << "\n\n";
+
+			double beta = 0.0;
+			cout << "Beta:\n";
+			cout << "------\n";
+			cout << "Beta ist der Einfluss von zusaetzlichen Daten (z.B. Kantengewicht und erfassten "
+				<< "Daten, ob eine Kante / ein Knoten bereits von der Ameise besucht wurde) "
+				<< "und liegt ebenfalls im Bereich ]0,1[. Defaultwert ist 0.7\n";
+			while (beta <= 0 || beta >= 1) {
+				cout << "Eingabe von Beta: ";
+				if (!(cin >> beta) || beta == 0) {
+					cout << "\nFalsche Eingabe!\n";
+					cin.clear();
+					while (cin.get() != '\n');
+				}
+				else if (beta <= 0 || beta >= 1)
+					cout << "\nEingegebener Wert liegt nicht im Wertebereich ]0,1[ !\n";
+			}
+			cout << "\n\n";
+
+			double rho = 0.0;
+			cout << "Rho:\n";
+			cout << "----\n";
+			cout << "Rho ist Geschwindigkeit, mit der Pheromone nach jeder Iteration wieder verdampfen.\n";
+			cout << "Rho liegt ebenfalls im Bereich ]0,1[. 0 wuerde bedeuten, dass keine Pheromone verdampfen "
+				<< "wuerden, 1 wuerde bedeuten, dass alle Pheromone nach jeder Iteration verdampfen.\n";
+			cout << "Defaultwert ist 0.3\n";
+			while (rho <= 0 || rho >= 1) {
+				cout << "Eingabe von Rho: ";
+				if (!(cin >> rho) || rho == 0) {
+					cout << "\nFalsche Eingabe!\n";
+					cin.clear();
+					while (cin.get() != '\n');
+				}
+				else if (rho <= 0 || rho >= 1)
+					cout << "\nEingegebener Wert liegt nicht im Wertebereich ]0,1[ !\n";
+			}
+			cout << "\n\n";
+
+			int m_max = 0;
+			cout << "Anzahl der Ameisen:\n";
+			cout << "-------------------\n";
+			cout << "Die Anzahl der Ameisen beeinflusst nachhaltig die Qualität des Ergebnisses.\n";
+			cout << "Wertebereich: >= 1, Defaultwert ist 5.\n";
+			while (m_max < 1) {
+				cout << "Eingabe: ";
+				if (!(cin >> m_max) || m_max == 0) {
+					cout << "\nFalsche Eingabe!\n";
+					cin.clear();
+					while (cin.get() != '\n');
+				}
+				else if (m_max <= 1)
+					cout << "\nEingegebener Wert liegt nicht im Wertebereich >= 1 !\n";
+			}
+			cout << "\n\n";
+
+			//Globales bestes Ergebnis:
+			int * overall_shortest_path = new int[dimension]; //Abfolge der Knotenreihenfolge des bisher kürzesten Weges
+			int overall_shortest_path_hops; //Anzahl der Knoten von Start- bis Ziel
+			double overall_shortest_path_length; //Länge des bisher kürzesten Weges
+
+			bool wrong_parameters = false;
+
+			for (int i = 1; i <= m_max; ++i) {
+				int retry = 0;
+				while (!world.sh_path(dimension, adjazenz, start, stop, alpha, beta, rho, i, false, false) && !wrong_parameters) {
+					++retry;
+					if (retry > 100) {
+						wrong_parameters = true;
+						cout << "Leider konvergiert der Ameisenalgorithmus nicht. Das kann daran liegen, dass Zufallswerte "
+							 << "auf ihrem Computer nicht in ausreichend guter Qualität generiert werden koennen, oder noch "
+							 << "wahrschienlicher haben Sie schlechte Parameter definiert. Versuchen Sie es bitte mit anderen "
+							 << "Parameter nochmals.\n\n";
+					}
+				}
+
+				if (!wrong_parameters) {
+					//beim Ersten Mal die Werte kopieren, um die Variablen zu befüllen:
+					if (i == 1) {
+						copy(world.shortest_path, world.shortest_path + dimension, overall_shortest_path);
+						overall_shortest_path_hops = world.shortest_path_hops;
+						overall_shortest_path_length = world.shortest_path_length;
+					}
+
+					if (world.shortest_path_length < overall_shortest_path_length
+						|| (world.shortest_path_length == overall_shortest_path_length
+							&& world.shortest_path_hops < overall_shortest_path_hops)) {
+						copy(world.shortest_path, world.shortest_path + dimension, overall_shortest_path);
+						overall_shortest_path_hops = world.shortest_path_hops;
+						overall_shortest_path_length = world.shortest_path_length;
+					}
+					cout << "Gefundener Shortest Path mit " << i << " Ameise(n):\n";
+					world.print_sh_path();
+				}
+			}
+
+			if (!wrong_parameters) {
+				//Auagabe des globalen Optimums:
+				cout << "Bester gefundener Shortest Path:\n";
+				cout << "--------------------------------\n";
+				cout << "--------------------------------\n";
+				copy(overall_shortest_path, overall_shortest_path + dimension, world.shortest_path);
+				world.shortest_path_hops = overall_shortest_path_hops;
+				world.shortest_path_length = overall_shortest_path_length;
+				world.print_sh_path();
+				cout << "\n\n";
+			}
+
+			bool correct = false;
+			char input;
+			while (!correct) {
+				cout << "Wollen Sie das Programm neu starten? (mit neuem Start- und Zielknoten)\n";
+				cout << "...dann geben Sie 'n' ein.\n\n";
+				cout << "Wollen Sie neue Parameter eingeben? (mit gleichen Start- und Zielknoten)\n";
+				cout << "...dann geben Sie 'p' ein.\n\n";
+				cout << "Wollen Sie das Programm beenden?\n";
+				cout << "...dann geben Sie 'e' ein.\n\n";
+				cin >> input;
+				if (input == 'n' || input == 'p' || input == 'e')
+					correct = true;
+				else
+					cout << "Falsche Eingabe!\n\n";
+			}
+			if (input == 'n')
+				exit = true;
+			if (input == 'e') {
+				exit = true;
+				programm_laufen_lassen = false;
+			}
+			cout << "\n\n";
+		}
+	}
 }

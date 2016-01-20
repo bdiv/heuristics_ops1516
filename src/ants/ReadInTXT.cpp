@@ -76,18 +76,6 @@ double inline ** Matrix::getMatrix(){
 			}
 		}
 
-		//************************ ANFANG DEBUG ANFANG ****************************
-		for(int a = 0; a < n; a++)
-		{
-			for(int b = 0; b < n; b++)
-			{
-			  cout << adjazenz [a][b] << "  "; 
-			}
-
-			cout << endl; 
-		}
-		//************************ ENDE DEBUG ENDE ****************************
-
 		file.close();
 
 	}
@@ -106,16 +94,4 @@ int inline Matrix::getDimension(){
 	//Return Dimension
 	return this->n; 
 }
-
-/*int main(){
-
-	Matrix matrix; 
-
-	int n = matrix.getDimension(); 
-	double ** adjazenz = matrix.getMatrix(); 
-
-	
-
-	return 0; 
-}*/
 
