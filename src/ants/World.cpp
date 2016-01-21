@@ -30,17 +30,18 @@ public:
 	int iterations; //Iterationen, die mit den Ameisen bereits durchlaufen wurden. Wenn alle Ameisen einen Pfad zum Ziel gefunden haben, ist eine Iteration abgeschlossen. Erst nach 3 Iterationen werden die Pheromone berücksichtigt. 
 	bool ** vi_edges; //Gibt an, ob Ameise schon auf Knoten war oder nicht
 	bool * vi_nodes; //Liste mit allen schon besuchten Knoten
-	Ant *ameise;
-	bool give_outputs;
-	bool stop_between_iterations;
+	Ant *ameise; //Ameisen
+	bool give_outputs; //Ausgaben ausfuehren: Zum Debuggen bzw. nachvollziehen der einzelnen Schritte)
+	bool stop_between_iterations; //Einen Stop zwischen den Iterationen einfuegen (damit man die einzelnen Schritte besser mitlesen kann)
+	int iteration_pheromones; //Anzahl der Iterationen, ab denen die Pheromone aktiv werden
 
 	World(int n); //Konstruktor
 	~World(); //Offizieller Destruktor (ruft clear() auf)
-	void clear(); //Eigentlicher Destruktor
+	//void clear(); //Eigentlicher Destruktor
 
 	bool sh_path(int n, double ** adjazenz, int start, int ende,
-		double alpha, double beta, double rho, int m, bool give_outputs, 
-		bool stop_between_iterations); //Berechnung des shortest-paths
+		double alpha, double beta, double rho, int m, int iteration_pheromones,
+		bool give_outputs, bool stop_between_iterations); //Berechnung des shortest-paths
 
 	double compute_coefficient(int i, int j); //Berechnung des Koeffizienten zur Entscheidung, in welche Richtung die Ameise weiter geht (wird in Funktion select_next_edge() für jede der ausgehenden Kanten aufgerufen)
 	int select_next_edge(int a); //Auswahl des nächsten Knotens anhand des aktuellen Knotens, an dem sich eine Ameise befindet und dem Knoten, von dem sie gekommen ist. Nach dem Aufruf von compute_coefficient für jede Kante (außer jender, von der die Ameise gekommen ist) wird entschieden, zu welchem Knoten die Ameise weitergeht.
@@ -55,13 +56,9 @@ public:
 
 World::World(int n) {
 
-	//Initialisierung mit Defaultwerten
-	alpha = 0.3;
-	beta = 0.7;
+	//Initialisierung:
 	tau_0 = 0.0;
 	tau_neu_max = 1;
-	rho = 0.3;
-	m = 5;
 
 	this->n = n;
 
@@ -80,9 +77,13 @@ World::World(int n) {
 
 World::~World() {
 
-	clear();
+	delete[] adjazenz;
+	delete[] pheromone;
+	delete[] vi_edges;
+	delete[] vi_nodes;
+	delete[] ameise;
 }
-
+/*
 void World::clear() {
 
 	delete[] adjazenz;
@@ -91,13 +92,14 @@ void World::clear() {
 	delete[] vi_nodes;
 	delete[] ameise;
 }
+*/
 
 bool World::sh_path(int n, double ** adjazenz, int start, int ende,		
-	double alpha, double beta, double rho, int m, bool give_outputs, 
-	bool stop_between_iterations) {
+	double alpha, double beta, double rho, int m, int iteration_pheromones,
+	bool give_outputs, bool stop_between_iterations) {
+
 	//Abspeichern der Übergabeparameter
-	//n wird nicht mehr benötigt, da es schon im Konstruktor übergeben wird.
-	//this->n = n;
+	//n wird bereits im Konstruktor übergeben
 	this->start = start;
 	this->ende = ende;
 	this->adjazenz = adjazenz;
@@ -105,6 +107,7 @@ bool World::sh_path(int n, double ** adjazenz, int start, int ende,
 	this->beta = beta;
 	this->rho = rho;
 	this->m = m;
+	this->iteration_pheromones = iteration_pheromones;
 	this->give_outputs = give_outputs;
 	this->stop_between_iterations = stop_between_iterations;
 
@@ -158,6 +161,7 @@ bool World::sh_path(int n, double ** adjazenz, int start, int ende,
 					//Wurde bereits mehrere Male Neuinitialisiert --> breche ab
 					if (neuinitialisierungen == 100)
 						return false;
+
 					ameise[a].init(n);
 					aktueller_Knoten = start;
 					ameise[a].path[0] = start;
@@ -203,8 +207,7 @@ bool World::sh_path(int n, double ** adjazenz, int start, int ende,
 		update_pheromones();
 
 		//Kontrolle ob kürzester Pfad bereits gefunden wurde
-
-		if (iterations > 3) {
+		if (iterations > iteration_pheromones) {
 
 			double anteil_relativ = 0.8;
 			//Berechnen des absoluten Anteils anhand unserer Populationsgröße:
@@ -269,6 +272,8 @@ bool World::sh_path(int n, double ** adjazenz, int start, int ende,
 			}
 		}
 	}
+
+	//Ameisenalgorithmus konvergiert:
 	return true;
 }
 
@@ -298,7 +303,7 @@ double World::compute_coefficient(int i, int j) {
 	}
 	else
 	{
-		if (iterations < 3)
+		if (iterations < iteration_pheromones)
 		{
 			return 0;
 		}
@@ -392,7 +397,6 @@ int World::select_next_edge(int a) {
 		if (give_outputs)
 			cout << "Muss Zufaellig entscheiden...";
 		//Generiere Zufallszahl:
-		srand(time(NULL));
 		int random = randomize();
 		index = double(random / 10000.0) * double(index + 1);
 		naechster_knoten = moegliche_knoten[index];
@@ -607,9 +611,11 @@ int main() {
 			cout << "\n\n";
 
 			int m_max = 0;
-			cout << "Anzahl der Ameisen:\n";
-			cout << "-------------------\n";
+			cout << "Maximale Anzahl der Ameisen:\n";
+			cout << "----------------------------\n";
 			cout << "Die Anzahl der Ameisen beeinflusst nachhaltig die Qualität des Ergebnisses.\n";
+			cout << "Um die Qualitaet des Ergebnisses zu verbessern, iterieren wir von 1 bis zur maximal "
+				 << "eingegebenen Anzahl der Ameisen durch und suchen nach dem Besten Ergebnis.";
 			cout << "Wertebereich: >= 1, Defaultwert ist 5.\n";
 			while (m_max < 1) {
 				cout << "Eingabe: ";
@@ -631,35 +637,37 @@ int main() {
 			bool wrong_parameters = false;
 
 			for (int i = 1; i <= m_max; ++i) {
-				int retry = 0;
-				while (!world.sh_path(dimension, adjazenz, start, stop, alpha, beta, rho, i, false, false) && !wrong_parameters) {
-					++retry;
-					if (retry > 100) {
-						wrong_parameters = true;
-						cout << "Leider konvergiert der Ameisenalgorithmus nicht. Das kann daran liegen, dass Zufallswerte "
-							 << "auf ihrem Computer nicht in ausreichend guter Qualität generiert werden koennen, oder noch "
-							 << "wahrschienlicher haben Sie schlechte Parameter definiert. Versuchen Sie es bitte mit anderen "
-							 << "Parameter nochmals.\n\n";
-					}
-				}
-
-				if (!wrong_parameters) {
-					//beim Ersten Mal die Werte kopieren, um die Variablen zu befüllen:
-					if (i == 1) {
-						copy(world.shortest_path, world.shortest_path + dimension, overall_shortest_path);
-						overall_shortest_path_hops = world.shortest_path_hops;
-						overall_shortest_path_length = world.shortest_path_length;
+				for (int j = 1; j <= 5; ++j) {
+					int retry = 0;
+					while (!world.sh_path(dimension, adjazenz, start, stop, alpha, beta, rho, i, j, false, false) && !wrong_parameters) {
+						++retry;
+						if (retry > 10) {
+							wrong_parameters = true;
+							cout << "Leider konvergiert der Ameisenalgorithmus nicht. Das kann daran liegen, dass Zufallswerte "
+								 << "auf ihrem Computer nicht in ausreichend guter Qualität generiert werden koennen, oder noch "
+								 << "wahrschienlicher haben Sie schlechte Parameter definiert. Versuchen Sie es bitte mit anderen "
+								 << "Parameter nochmals.\n\n";
+						}
 					}
 
-					if (world.shortest_path_length < overall_shortest_path_length
-						|| (world.shortest_path_length == overall_shortest_path_length
-							&& world.shortest_path_hops < overall_shortest_path_hops)) {
-						copy(world.shortest_path, world.shortest_path + dimension, overall_shortest_path);
-						overall_shortest_path_hops = world.shortest_path_hops;
-						overall_shortest_path_length = world.shortest_path_length;
+					if (!wrong_parameters) {
+						//beim Ersten Mal die Werte kopieren, um die Variablen zu befüllen:
+						if (i == 1) {
+							copy(world.shortest_path, world.shortest_path + dimension, overall_shortest_path);
+							overall_shortest_path_hops = world.shortest_path_hops;
+							overall_shortest_path_length = world.shortest_path_length;
+						}
+
+						if (world.shortest_path_length < overall_shortest_path_length
+							|| (world.shortest_path_length == overall_shortest_path_length
+								&& world.shortest_path_hops < overall_shortest_path_hops)) {
+							copy(world.shortest_path, world.shortest_path + dimension, overall_shortest_path);
+							overall_shortest_path_hops = world.shortest_path_hops;
+							overall_shortest_path_length = world.shortest_path_length;
+						}
+						//cout << "Gefundener Shortest Path mit " << i << " Ameise(n) und Pheromone, die ab der " << j << ". Iteration aktiv sind:\n";
+						//world.print_sh_path();
 					}
-					cout << "Gefundener Shortest Path mit " << i << " Ameise(n):\n";
-					world.print_sh_path();
 				}
 			}
 
